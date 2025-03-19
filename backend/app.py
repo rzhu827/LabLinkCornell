@@ -61,12 +61,12 @@ def episodes_search():
     text = request.args.get("title")
     return json_search(text)
 '''
-
+@app.route('/search')
 def search():
-    interests_query = request.args.get("interests", "")
+    query = request.args.get("query", "")
     #citation_range = request.args.get("citations", "0")
     
-    results = or_search_publications(interests_query)
+    results = or_search_publications(query)
     return results
 
 if 'DB_NAME' not in os.environ:
