@@ -3,7 +3,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
+    rel="stylesheet">
+
 <body>
     <div class="full-body-container">
         <div class="top-text">
@@ -12,48 +14,65 @@
             </div>
             <div class="input-box" onclick="sendFocus()">
                 <img src="{{ url_for('static', filename='images/mag.png') }}" />
-                <input placeholder="Type in your research interests" id="filter-text-val" onkeyup="filterText()">
+                <input placeholder="Type in your research interests and press Enter to search" id="search-query-input"
+                    onkeydown="handleEnterKey(event)">
             </div>
         </div>
-        <div id="answer-box">
+        <div id="answer-box"> <!-- results -->
 
         </div>
     </div>
 
     <script>
 
-        function answerBoxTemplate(name, matched_publications){
-            return `<div class=''>
-                <h3 class='prof-name'>${name}</h3>
+        function handleEnterKey(event) {
+            if (event.key === "Enter") {
+                searchQuery();
+            }
+        }
+
+        function answerBoxTemplate(index, name, affiliation, interests, citations, publications) {
+            return `<div class='professor-entry'>
+                <h3 class='prof-name'>${index}. ${name}</h3>
+                <p class='affiliation'><strong>Affiliation:</strong> ${affiliation}</p>
+                <p class='interests'><strong>Research Interests:</strong> ${interests.join(', ')}</p>
+                <p class='citations'><strong>Citations:</strong> ${citations}</p>
+                <h4>Relevant Publications:</h4>
                 <ul class='publications'>
-                    ${matched_publications.map(pub => `<li>${pub}</li>`).join("")}
+                    ${publications.map(pub => `<li>${pub}</li>`).join("")}
                 </ul>
             </div>`
         }
 
-        function sendFocus(){
-            document.getElementById('filter-text-val').focus()
+        function sendFocus() {
+            document.getElementById("search-query-input").focus()
         }
 
-        function filterText(){
-            document.getElementById("answer-box").innerHTML = ""
-            let query = document.getElementById("filter-text-val").value;
+        function searchQuery() {
+            let query = document.getElementById("search-query-input").value;
             console.log(query)
             fetch("/search?" + new URLSearchParams({ query }).toString())
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.length === 0) {
-                    document.getElementById("answer-box").innerHTML = "<p>No results found.</p>";
-                    return;
-                }
-            
-                data.forEach(row => {
-                    let tempDiv = document.createElement("div")
-                    tempDiv.innerHTML = answerBoxTemplate(row.name, row.matched_publications)
-                    document.getElementById("answer-box").appendChild(tempDiv)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.length === 0) {
+                        document.getElementById("answer-box").innerHTML = "<p>No results found.</p>";
+                        return;
+                    }
+
+                    document.getElementById("answer-box").innerHTML = "";
+
+                    data.forEach((row, index) => {
+                        let tempDiv = document.createElement("div")
+                        tempDiv.innerHTML = answerBoxTemplate(
+                            index + 1,
+                            row.name,
+                            row.affiliation,
+                            row.interests,
+                            row.citations,
+                            row.publications)
+                        document.getElementById("answer-box").appendChild(tempDiv)
+                    });
                 });
-            });
         }
-            
     </script>
 </body>
