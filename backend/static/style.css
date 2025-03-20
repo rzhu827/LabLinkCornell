@@ -7,14 +7,22 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 50px;
+    padding-top: 120px;
 }
 
 .top-text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-bottom: 50px;
+    padding-bottom: 40px;
+}
+
+.top-text h1 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    text-align: center;
+    color: #2451a9;
 }
 
 .answer-box {
@@ -25,21 +33,22 @@ body {
 .professor-entry {
     margin-bottom: 30px;
     padding: 20px;
-    border: 1px solid #ddd;
     border-radius: 10px;
-    background-color: #f9f9f9;
+    background-color: #ebf5ff;
     width: 1000px;
+    font-family: 'Roboto', sans-serif;
 }
 
 .input-box {
     display: flex;
     align-items: center;
-    border: 3px solid #709dce;
+    border: 3px solid #9bcdff;
     border-radius: 50px;
     padding: 16px;
-    width: 500px;
+    width: 600px;
     background-color: white;
-    margin-top: 30px
+    margin-top: 20px;
+    margin-bottom: 40px
 }
 
 .input-box input {
