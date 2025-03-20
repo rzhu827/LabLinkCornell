@@ -25,8 +25,6 @@ CORS(app)
 # GLOBAL VARIABLES
 inverted_index = defaultdict(lambda: defaultdict(int))  # { term : { prof_key : term_freq } }
 prof_to_citations = {(prof_data.get("name"), prof_data.get("id", "")): prof_data.get('citations') for prof_data in data}  # { prof_key : citations }
-# TF_WEIGHT = 0.7
-# CITATION_WEIGHT = 0.3
 
 
 def build_inverted_index():

@@ -19,7 +19,7 @@
 
                 <!-- citation dropdown -->
                 <div class="dropdown">
-                    <button id="citation-btn" class="dropdown-btn">Citations v</button>
+                    <button id="citation-btn" class="dropdown-btn">Citations</button>
                     <div class="dropdown-content" id="citation-options">
                         <div onclick="selectCitationRange('N/A')">N/A</div>
                         <div onclick="selectCitationRange('1-10,000')">1-10,000</div>
@@ -65,7 +65,7 @@
 
         // set selected citation range
         function selectCitationRange(range) {
-            document.getElementById("citation-btn").textContent = range + " v";
+            document.getElementById("citation-btn").textContent = range;
             document.querySelector(".dropdown").classList.remove("active");
         }
 
@@ -94,8 +94,8 @@
 
         function searchQuery() {
             let query = document.getElementById("search-query-input").value;
-            let citations = document.getElementById("citation-btn").textContent.replace(" v", "");
-            if (citations == "N/A") {
+            let citations = document.getElementById("citation-btn").textContent;
+            if (citations == "N/A" || citations == "Citations") {
                 citations = 0;
             }
             else if (citations == "100,000+") {
