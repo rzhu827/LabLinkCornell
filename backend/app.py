@@ -172,6 +172,7 @@ def tf_ranked_search(query, citation_range):
             top_publications = get_top_publications(prof_data, query_terms)
             results.append({
                 "name": prof_name,
+                "id": prof_data.get("id", ""),
                 "affiliation": prof_data.get("affiliation", "Cornell University"),
                 "interests": prof_data.get("interests", []),
                 "citations": prof_citations,
@@ -271,6 +272,7 @@ def prepare_results(ranked_profs, query_vector):
             
             results.append({
                 "name": prof_name,
+                "id": prof_data.get("id", ""),
                 "affiliation": prof_data.get("affiliation", "Cornell University"),
                 "interests": prof_data.get("interests", []),
                 "citations": prof_to_citations[prof_key],

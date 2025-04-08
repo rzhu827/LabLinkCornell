@@ -201,8 +201,35 @@ body {
 }
 
 .prof-name {
+    white-space: nowrap;
     font-size: 32px;
     margin: 0;
+}
+
+/* google scholar link */
+.prof-link {
+    color: #aec3d2;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.prof-link:hover {
+    color: #ffffff;
+}
+
+.link-icon {
+    width: 22px;
+    height: 22px;
+    margin-left: 4px;
+    padding-bottom: 5px;
+    vertical-align: middle;
+    opacity: 1;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.prof-link:hover .link-icon {
+    opacity: 1;
 }
 
 .affiliation {
@@ -210,6 +237,8 @@ body {
     font-weight: normal;
     color: #aec3d2;
     margin: 0;
+    max-width: 60%;
+    word-wrap: break-word;
 }
 
 .interests {
