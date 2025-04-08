@@ -4,8 +4,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
-    rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&display=swap" rel="stylesheet">
 
 <body>
     <div class="full-body-container">
@@ -20,7 +20,9 @@
 
                 <!-- citation dropdown -->
                 <div class="dropdown">
-                    <button id="citation-btn" class="dropdown-btn">Citations</button>
+                    <button id="citation-btn" class="dropdown-btn">Citations
+                        <span class="arrow">▼</span>
+                    </button>
                     <div class="dropdown-content" id="citation-options">
                         <div onclick="selectCitationRange('N/A')">N/A</div>
                         <div onclick="selectCitationRange('1-10,000')">1-10,000</div>
@@ -32,7 +34,7 @@
 
                 <!-- search button -->
                 <button class="search-btn" onclick="searchQuery()">
-                    <img src="{{ url_for('static', filename='images/mag.png') }}" alt="Search">
+                    <img src="{{ url_for('static', filename='images/search 2.png') }}" alt="Search">
                 </button>
             </div>
         </div>
@@ -41,61 +43,108 @@
         <div id="answer-box">
 
         </div>
+
+        <!-- authorship -->
+        <div id="authorship" class="hidden-authorship">
+            Created by Beau Hayes-Pollard, Analeah Real, Joice Chen, Tina Chen, and Richard Zhu. For academic purposes
+            only.
+        </div>
+
     </div>
 
-    <script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.21/vanta.net.min.js"></script>
 
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
+            VANTA.NET({
+                el: "body",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 650.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0x77ff,
+                backgroundColor: 0x40416,
+                points: 6.00,
+                maxDistance: 21.00,
+                spacing: 14.00
+            });
+
+            const search_input = document.getElementById("search-query-input");
+
+            // Detect Enter key for search
+            search_input.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    searchQuery();
+                }
+            });
+
             const citation_btn = document.getElementById("citation-btn");
             const dropdown = document.querySelector(".dropdown");
+            const arrow = citation_btn.querySelector(".arrow");
 
-            // toggle dropdown
+            // Toggle dropdown
             citation_btn.addEventListener("click", function (event) {
                 event.stopPropagation();
                 dropdown.classList.toggle("active");
+
+                // Flip the arrow based on the dropdown state
+                if (dropdown.classList.contains("active")) {
+                    arrow.style.transform = "rotate(180deg)";
+                } else {
+                    arrow.style.transform = "rotate(0deg)";
+                }
             });
 
-            // close dropdown
+            // Close dropdown
             document.addEventListener("click", function () {
-                dropdown.classList.remove("active");
+                if (dropdown.classList.contains("active")) {
+                    dropdown.classList.remove("active");
+                    arrow.style.transform = "rotate(0deg)"; // Reset arrow
+                }
             });
 
-            // focus on search bar on page load
+            // Focus on search bar on page load
             document.getElementById("search-query-input").focus();
         });
 
-        // set selected citation range
-        function selectCitationRange(range) {
-            document.getElementById("citation-btn").textContent = range;
-            document.querySelector(".dropdown").classList.remove("active");
-        }
-
-        function handleEnterKey(event) {
-            if (event.key === "Enter") {
-                searchQuery();
-            }
-        }
 
         function answerBoxTemplate(index, name, affiliation, interests, citations, publications) {
             return `<div class='professor-entry'>
-                <h3 class='prof-name'>${index}. ${name}</h3>
-                <p class='affiliation'><strong>Affiliation:</strong> ${affiliation}</p>
-                <p class='interests'><strong>Research Interests:</strong> ${interests.join(', ')}</p>
-                <p class='citations'><strong>Citations:</strong> ${citations}</p>
-                <h4>Relevant Publications:</h4>
-                <ul class='publications'>
-                    ${publications.map(pub => `<li>${pub}</li>`).join("")}
-                </ul>
-            </div>`
+                <div class='divider-line'></div>
+                <div class='professor-header'>
+                    <p class='prof-name'>${name}</p>
+                    <p class='affiliation'>${affiliation}</p>
+                </div>
+                <p class='interests'>${interests.join(', ')}</p>
+                <div class='publications'>
+                    <h4>Relevant Publications:</h4>
+                    <ul class='publications'>
+                        ${publications.map(pub => `<li>${pub}</li>`).join("")}
+                    </ul>
+                </div>
+                <p class='citation-count'>${citations} Citations</p>
+            </div>`;
         }
 
         function sendFocus() {
             document.getElementById("search-query-input").focus()
         }
 
+        function selectCitationRange(value) {
+            let citation_btn = document.getElementById("citation-btn");
+            let arrow = citation_btn.querySelector(".arrow");
+            citation_btn.innerHTML = `${value} <span class="arrow">▼</span>`; // Update text while keeping the arrow
+        }
+
         function searchQuery() {
             let query = document.getElementById("search-query-input").value;
-            let citations = document.getElementById("citation-btn").textContent;
+            let citation_btn = document.getElementById("citation-btn");
+            let citations = citation_btn.childNodes[0].nodeValue.trim();
+
             if (citations == "N/A" || citations == "Citations") {
                 citations = 0;
             }
@@ -103,7 +152,7 @@
                 citations = 100000;
             }
 
-            console.log(query)
+            console.log(query);
             fetch("/search?" + new URLSearchParams({ query, citations }).toString())
                 .then((response) => response.json())
                 .then((data) => {
@@ -127,5 +176,19 @@
                     });
                 });
         }
+
+        window.addEventListener('scroll', () => {
+            const authorship = document.getElementById('authorship');
+            const scrollY = window.scrollY;
+            const viewportHeight = window.innerHeight;
+            const fullHeight = document.body.offsetHeight;
+
+            const isAtBottom = scrollY + viewportHeight >= fullHeight - 5;
+
+            if (isAtBottom) {
+                authorship.classList.add('show-authorship');
+            }
+        });
+
     </script>
 </body>

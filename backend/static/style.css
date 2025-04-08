@@ -1,64 +1,71 @@
 /* general styles */
 body {
-    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    font-family: 'Helvetica', sans-serif;
+    background-color: #040416;
+    /* Solid background color for the rest of the page */
 }
 
 .full-body-container {
+    position: absolute;
+    width: 100vw;
+    height: auto;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 120px;
+    justify-content: flex-start;
+    padding-top: 200px;
 }
 
 .top-text {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 32px;
     padding-bottom: 40px;
 }
 
 .top-text h1 {
-    font-family: 'Roboto', sans-serif;
-    font-size: 56px;
-    font-weight: 700;
+    font-size: 44px;
+    font-weight: 500;
     text-align: center;
-    color: #2451a9;
+    color: #aec3d2;
+    font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, sans-serif;
+    font-weight: 50;
 }
 
-.answer-box {
-    width: 1000px;
-    margin-top: 50px;
-}
-
-.professor-entry {
-    margin-bottom: 30px;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #ebf5ff;
-    width: 1000px;
-    font-family: 'Roboto', sans-serif;
-}
-
+/* search bar */
 .input-box {
     display: flex;
     align-items: center;
-    border: 3px solid #9bcdff;
-    border-radius: 50px;
-    padding: 16px;
-    width: 600px;
-    background-color: white;
+    border: 3px transparent;
+    border-radius: 40px;
+    padding: 12px;
+    width: 640px;
+    background-color: rgba(96, 117, 164, 0.249);
     margin-top: 20px;
-    margin-bottom: 40px
 }
 
 .input-box input {
     border: none;
     outline: none;
     flex-grow: 1;
-    padding: 5px;
+    padding: 10px;
+    padding-left: 15px;
+    background-color: transparent;
     font-family: inherit;
+    caret-color: #cadce9;
+    color: #cadce9;
+    font-size: 15px;
 }
 
+.input-box input::placeholder {
+    color: #85abc8;
+    font-size: 15px;
+}
+
+/* citation menu */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -69,24 +76,26 @@ body {
     border: none;
     cursor: pointer;
     padding: 5px 10px;
-    color: black;
+    color: #cadce9;
     font-family: inherit;
+    font-size: 15px;
 }
 
 .dropdown-btn:hover {
-    background-color: #f0f0f0;
+    color: white;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
-    background: white;
+    background: #cadce9;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
-    width: 120px;
+    width: 160px;
     top: 30px;
     right: 0;
     z-index: 10;
+    overflow: hidden;
 }
 
 .dropdown-content div {
@@ -94,16 +103,32 @@ body {
     cursor: pointer;
     text-align: center;
     font-family: inherit;
+    color: rgb(28, 51, 102);
+    transition: background-color 0.2s ease-in-out;
 }
 
 .dropdown-content div:hover {
-    background-color: #f0f0f0;
+    background-color: #aec7e2;
 }
 
 .dropdown.active .dropdown-content {
     display: block;
 }
 
+.arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    color: #cadce9;
+    font-size: 10px;
+    margin-left: 5px;
+    margin-bottom: 2px;
+}
+
+.dropdown.active .arrow {
+    transform: rotate(180deg);
+}
+
+/* search button */
 .search-btn {
     background: none;
     border: none;
@@ -114,4 +139,102 @@ body {
 .search-btn img {
     width: 20px;
     height: 20px;
+    transform: scale(2.0);
+    margin-top: 4px;
+    margin-left: 15px;
+    margin-right: 6px;
+}
+
+/* result output */
+#answer-box {
+    margin-top: 151px;
+    padding-bottom: 160px;
+    /* Add space for scrolling */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.professor-entry {
+    position: relative;
+    margin-bottom: 64px;
+    padding: 32px;
+    border-radius: 10px;
+    background-color: transparent;
+    width: 940px;
+    font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, sans-serif;
+    color: #aec3d2;
+}
+
+.divider-line {
+    height: 0.5px;
+    background-color: #aec3d2;
+    margin-bottom: 40px;
+}
+
+.professor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prof-name {
+    font-size: 32px;
+    margin: 0;
+}
+
+.affiliation {
+    font-size: 18px;
+    font-weight: normal;
+    color: #aec3d2;
+    margin: 0;
+}
+
+.interests {
+    margin-top: 30px;
+    font-size: 18px;
+    margin-bottom: 50px;
+    color: #aec3d2;
+}
+
+.publications-section h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #aec3d2;
+}
+
+.publications {
+    list-style-type: disc;
+    color: #617CC7;
+    font-size: 16px;
+}
+
+.publications li {
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.citation-count {
+    margin-top: 20px;
+    position: absolute;
+    right: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #617CC7;
+}
+
+/* authorship */
+.hidden-authorship {
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    text-align: center;
+    font-size: 12px;
+    color: #4e5e89;
+    margin-top: 40px;
+    padding-bottom: 40px;
+}
+
+.show-authorship {
+    opacity: 1;
 }
