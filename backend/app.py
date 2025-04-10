@@ -6,6 +6,8 @@ from utils.preprocessing import preprocess_text
 from utils import indices
 from utils.indices import build_indices, load_data
 from utils.similarity import cosine_sim, calculate_jaccard_similarity
+import csv
+from ast import literal_eval
 
 app = Flask(__name__)
 CORS(app)
@@ -81,6 +83,29 @@ def get_relevant_publications(prof_key, query_vector):
         pub_scores.append((publication, similarity))
     return [pub for pub, _ in sorted(pub_scores, key=lambda x: x[1], reverse=True)[:3]]
 
+def get_relevant_coauthors(prof_key, query_vector):
+    """Get top 3 most relevant coauthors for a professor using cosine similarity with TF-IDF"""
+    profs_to_pubs = {} # {prof_id : [pub1, pub2, ...], ...}
+    prof_scores = defaultdict(int) # {prof_id : score}
+    with open("../network/coauthor_network_edge.csv") as file:
+        reader = csv.DictReader(file)
+        for edge in reader:
+            if edge["Source"] == prof_key[1] or edge["Target"] == prof_key[1]:
+                pub_list = literal_eval(edge["shared_publications"])
+                if edge["Source"] == prof_key[1]:
+                    profs_to_pubs[edge["Target"]] = pub_list
+                else:
+                    profs_to_pubs[edge["Source"]] = pub_list
+    
+    for prof_id, pubs in profs_to_pubs.items():
+        for pub in pubs: 
+            doc_vector = indices.tfidf_matrix[indices.publications_to_idx[pub]]
+            sim = cosine_sim(query_vector.toarray()[0], doc_vector.toarray()[0])
+            if sim > 0:
+                prof_scores[prof_id] += sim
+    
+    return [indices.profid_to_name[coauthor] for coauthor, _ in sorted(prof_scores.items(), key=lambda x: x[1], reverse=True)[:3]]
+
 def prepare_results(ranked_profs, query_vector):
     """Prepare final results with professor details and relevant publications."""
     results = []
@@ -92,6 +117,7 @@ def prepare_results(ranked_profs, query_vector):
         if prof_data:
             # Get top 3 relevant publications
             relevant_pubs = get_relevant_publications(prof_key, query_vector)
+            coauthors = get_relevant_coauthors(prof_key, query_vector)
             
             results.append({
                 "name": prof_name,
@@ -99,7 +125,8 @@ def prepare_results(ranked_profs, query_vector):
                 "affiliation": prof_data.get("affiliation", "Cornell University"),
                 "interests": prof_data.get("interests", []),
                 "citations": indices.prof_to_citations[prof_key],
-                "publications": relevant_pubs
+                "publications": relevant_pubs,
+                "coauthors": coauthors
             })
     return results
 
@@ -137,7 +164,13 @@ def combined_search(query, citation_range=None):
         [(prof_key, scores) for prof_key, scores in prof_scores.items()],
         key=lambda x: x[1]['total_score'],
         reverse=True)[:5]
-    return prepare_results(ranked_profs, query_vector)
+
+    res = prepare_results(ranked_profs, query_vector)
+    for prof in res: # debugging
+        print(prof["name"])
+        print(prof["coauthors"])
+        print() 
+    return res
 
 ###################
 # def get_top_publications(prof_data, query_terms):
@@ -223,6 +256,7 @@ def search():
     citation_range = request.args.get("citations", "0")
     
     results = combined_search(query, citation_range) #change the algorithm method here
+
     return jsonify(results)
 
 if 'DB_NAME' not in os.environ:

@@ -10,6 +10,8 @@ prof_to_citations = {}
 prof_to_publications = {}
 prof_to_interests = {}
 prof_index_map = {}
+profid_to_name = {}
+publications_to_idx = None
 corpus = []
 tfidf_vectorizer = None
 tfidf_matrix = None
@@ -19,10 +21,11 @@ def load_data():
         return json.load(f)
 
 def build_indices(data):
-    global tfidf_vectorizer, tfidf_matrix
+    global tfidf_vectorizer, tfidf_matrix, publications_to_idx
 
     for prof in data:
         prof_key = (prof["name"], prof["id"])
+        profid_to_name[prof["id"]] = prof["name"]
         prof_to_citations[prof_key] = prof.get("citations", 0)
         prof_to_publications[prof_key] = prof.get("publications", [])
         prof_to_interests[prof_key] = prof.get("interests", [])
@@ -39,3 +42,4 @@ def build_indices(data):
 
     tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.85, min_df=2, norm='l2')
     tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+    publications_to_idx = {pub : idx for idx, pub in enumerate(corpus)}

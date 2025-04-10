@@ -115,7 +115,7 @@
         });
 
 
-        function answerBoxTemplate(index, name, id, affiliation, interests, citations, publications) {
+        function answerBoxTemplate(index, name, id, affiliation, interests, citations, publications, coauthors) {
             return `<div class='professor-entry'>
                 <div class='divider-line'></div>
                 <div class='professor-header'>
@@ -133,6 +133,7 @@
                         ${publications.map(pub => `<li>${pub}</li>`).join("")}
                     </ul>
                 </div>
+                <p class='coauthors'>Relevant coauthors: ${coauthors.join(', ')}</p> 
                 <p class='citation-count'>${citations} Citations</p>
             </div>`;
         }
@@ -179,7 +180,8 @@
                             row.affiliation,
                             row.interests,
                             row.citations,
-                            row.publications)
+                            row.publications,
+                            row.coauthors)
                         document.getElementById("answer-box").appendChild(tempDiv)
                     });
                 });
