@@ -202,7 +202,7 @@ body {
 
 .prof-name {
     white-space: nowrap;
-    font-size: 32px;
+    font-size: 30px;
     margin: 0;
 }
 
@@ -233,7 +233,7 @@ body {
 }
 
 .affiliation {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: normal;
     color: #aec3d2;
     margin: 0;
