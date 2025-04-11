@@ -171,7 +171,7 @@ def combined_search(query, citation_range=None):
 
     calculate_final_scores(prof_scores)
 
-    # print(prof_scores) #debugginggg 
+    print(prof_scores) #debugginggg 
     ranked_profs = sorted(
         [(prof_key, scores) for prof_key, scores in prof_scores.items()],
         key=lambda x: x[1]['total_score'],
