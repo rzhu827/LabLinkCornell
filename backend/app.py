@@ -109,8 +109,10 @@ def combined_search(query, citation_range=None):
     professor interests, publications and citations. 
     Returns list of top 5 professors with their details and top 3 relevant publications.
     """
-    query_terms = set(preprocess_text(query))
-    if not query_terms:
+    query_ngrams, query_terms = preprocess_text(query)
+    
+    query_terms_set = set(query_terms)
+    if not query_terms_set:
         return []
     
     # Convert query to TF-IDF vector for publication matching
@@ -126,17 +128,18 @@ def combined_search(query, citation_range=None):
     
     citation_low, citation_high = process_citation_range(citation_range)
     
-    score_by_publications(query_vector_array, prof_scores)
-    score_by_interests(query_terms, prof_scores)
+    score_by_publications(query_vector_array, prof_scores)  # utilizes ngrams
+    score_by_interests(query_terms_set, prof_scores)  # utilizes token set
     score_by_citations(citation_low, citation_high, prof_scores)
 
     calculate_final_scores(prof_scores)
 
-    print(prof_scores) #debugginggg 
+    # print(prof_scores) #debugginggg 
     ranked_profs = sorted(
         [(prof_key, scores) for prof_key, scores in prof_scores.items()],
         key=lambda x: x[1]['total_score'],
         reverse=True)[:5]
+    print(ranked_profs) #debugging
     return prepare_results(ranked_profs, query_vector)
 
 ###################
