@@ -133,8 +133,19 @@
                         ${publications.map(pub => `<li>${pub}</li>`).join("")}
                     </ul>
                 </div>
-                <p class='coauthors'>Relevant coauthors: ${coauthors.join(', ')}</p> 
-                <p class='citation-count'>${citations} Citations</p>
+                <div class='details'>
+                    <div class='citation-count'>
+                        ${citations} Citations
+                    </div>
+                    <div class='coauthors'>
+                        <h4>Relevant Coauthors:</h4>
+                        <span>
+                            ${coauthors.length > 0
+                    ? coauthors.map(([name, id]) => `<a href="https://scholar.google.com/citations?user=${id}" target="_blank" class="coauthor-link">${name}</a>`).join(', ')
+                    : 'None'}
+                            </span>
+                    </div>
+                </div>
             </div>`;
         }
 

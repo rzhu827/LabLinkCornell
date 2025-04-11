@@ -2,12 +2,14 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os, re
 from collections import defaultdict
-from utils.preprocessing import preprocess_text
+from utils.preprocessing import custom_tokenizer
 from utils import indices
 from utils.indices import build_indices, load_data
-from utils.similarity import cosine_sim, calculate_jaccard_similarity
+from utils.similarity import calculate_jaccard_similarity
 import csv
 from ast import literal_eval
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 app = Flask(__name__)
 CORS(app)
@@ -25,15 +27,24 @@ def process_citation_range(citation_range):
         parts = re.sub(r'[^\d\-]', '', citation_range).split("-")
         return int(parts[0]), int(parts[1])
 
-def score_by_publications(query_vector_array, prof_scores):
-    """Score professors by publication similarity by TF-IDF."""
-    for idx, doc_vector in enumerate(indices.tfidf_matrix):
-        doc_vector_array = doc_vector.toarray()[0]
-        similarity = cosine_sim(query_vector_array, doc_vector_array)
+# def score_by_publications(query_vector_array, prof_scores):
+#     """Score professors by publication similarity by TF-IDF."""
+#     for idx, doc_vector in enumerate(indices.tfidf_matrix):
+#         doc_vector_array = doc_vector.toarray()[0]
+#         similarity = cosine_sim(query_vector_array, doc_vector_array)
         
-        if similarity > 0:
-            prof_key = indices.prof_index_map[idx]
-            prof_scores[prof_key]['publication_score'] += similarity
+#         if similarity > 0:
+#             prof_key = indices.prof_index_map[idx]
+#             prof_scores[prof_key]['publication_score'] += similarity
+
+def score_by_publications_lsi(query_vector, prof_scores):
+    query_lsi = indices.svd.transform(query_vector)
+
+    similarities = cosine_similarity(query_lsi, indices.lsi_matrix).flatten()
+
+    for doc_index, score in enumerate(similarities):
+        prof_key = indices.prof_index_map[doc_index]
+        prof_scores[prof_key]['publication_score'] += score
 
 def score_by_interests(query_terms, prof_scores):
     """Score professors based on interest relevance using Jaccard similarity."""
@@ -79,7 +90,7 @@ def get_relevant_publications(prof_key, query_vector):
     pub_scores = []
     for publication in publications:
         pub_vector = indices.tfidf_vectorizer.transform([publication])
-        similarity = cosine_sim(query_vector.toarray()[0], pub_vector.toarray()[0])
+        similarity = cosine_similarity(query_vector, pub_vector)[0][0]
         pub_scores.append((publication, similarity))
     return [pub for pub, _ in sorted(pub_scores, key=lambda x: x[1], reverse=True)[:3]]
 
@@ -100,11 +111,11 @@ def get_relevant_coauthors(prof_key, query_vector):
     for prof_id, pubs in profs_to_pubs.items():
         for pub in pubs: 
             doc_vector = indices.tfidf_matrix[indices.publications_to_idx[pub]]
-            sim = cosine_sim(query_vector.toarray()[0], doc_vector.toarray()[0])
+            sim = cosine_similarity(query_vector, doc_vector)[0][0]
             if sim > 0:
                 prof_scores[prof_id] += sim
-    
-    return [indices.profid_to_name[coauthor] for coauthor, _ in sorted(prof_scores.items(), key=lambda x: x[1], reverse=True)[:3]]
+
+    return [(indices.profid_to_name[coauthor], coauthor) for coauthor, _ in sorted(prof_scores.items(), key=lambda x: x[1], reverse=True)[:3]]
 
 def prepare_results(ranked_profs, query_vector):
     """Prepare final results with professor details and relevant publications."""
@@ -117,7 +128,7 @@ def prepare_results(ranked_profs, query_vector):
         if prof_data:
             # Get top 3 relevant publications
             relevant_pubs = get_relevant_publications(prof_key, query_vector)
-            coauthors = get_relevant_coauthors(prof_key, query_vector)
+            coauthors = get_relevant_coauthors(prof_key, query_vector)  # [(coauthor_name, coauthor_id)]
             
             results.append({
                 "name": prof_name,
@@ -136,15 +147,13 @@ def combined_search(query, citation_range=None):
     professor interests, publications and citations. 
     Returns list of top 5 professors with their details and top 3 relevant publications.
     """
-    query_ngrams, query_terms = preprocess_text(query)
-    
-    query_terms_set = set(query_terms)
+    query_terms_set = set(custom_tokenizer(query))
     if not query_terms_set:
         return []
     
     # Convert query to TF-IDF vector for publication matching
     query_vector = indices.tfidf_vectorizer.transform([query])
-    query_vector_array = query_vector.toarray()[0]
+    # query_vector_array = query_vector.toarray()[0]  # raw tfidf scoring
     
     prof_scores = defaultdict(lambda: {
         'publication_score': 0,  # TF-IDF
@@ -155,7 +164,8 @@ def combined_search(query, citation_range=None):
     
     citation_low, citation_high = process_citation_range(citation_range)
     
-    score_by_publications(query_vector_array, prof_scores)  # utilizes ngrams
+    # score_by_publications(query_vector_array, prof_scores)
+    score_by_publications_lsi(query_vector, prof_scores)
     score_by_interests(query_terms_set, prof_scores)  # utilizes token set
     score_by_citations(citation_low, citation_high, prof_scores)
 

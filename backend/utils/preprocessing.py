@@ -13,12 +13,12 @@ def custom_tokenizer(text):
     stemmed = [stemmer.stem(token) for token in tokens]  # stem each token
     return [t for t in stemmed if t not in stemmed_stop_words]  # filter out stop words
 
-def preprocess_text(text):
-    """Clean and tokenize text."""
+# def preprocess_text(text):
+#     """Clean and tokenize text."""
 
-    # generate ngrams using the custom tokenizer
-    vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer)
-    ngrams = vectorizer.fit_transform([text])  # transform the query text
+#     # generate ngrams using the custom tokenizer
+#     vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer)
+#     ngrams = vectorizer.fit_transform([text])  # transform the query text
     
-    # return n-grams and the tokenized version for reference
-    return ngrams, custom_tokenizer(text)
+#     # return n-grams and the tokenized version for reference
+#     return ngrams, custom_tokenizer(text)
