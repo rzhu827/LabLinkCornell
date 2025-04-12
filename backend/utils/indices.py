@@ -277,7 +277,14 @@ def build_indices(data):
     )
 
     tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
-    publications_to_idx = {pub : idx for idx, pub in enumerate(corpus)}
+    
+    # Create publications_to_idx mapping using both original and processed titles
+    publications_to_idx = {}
+    for prof in data:
+        for orig_pub, proc_pub in zip(prof.get("publications", []), prof_to_publications[(prof["name"], prof["id"])]):
+            idx = corpus.index(proc_pub)
+            publications_to_idx[orig_pub] = idx
+            publications_to_idx[proc_pub] = idx
 
     svd = TruncatedSVD(n_components=100)
     lsi_matrix = svd.fit_transform(tfidf_matrix)
