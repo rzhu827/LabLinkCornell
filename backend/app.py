@@ -9,7 +9,6 @@ from utils.similarity import calculate_jaccard_similarity
 import csv
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
-from config import EDGES_PATH
 
 
 app = Flask(__name__)
@@ -99,7 +98,7 @@ def get_relevant_coauthors(prof_key, query_vector):
     """Get top 3 most relevant coauthors for a professor using cosine similarity with TF-IDF"""
     profs_to_pubs = {} # {prof_id : [pub1, pub2, ...], ...}
     prof_scores = defaultdict(int) # {prof_id : score}
-    with open(EDGES_PATH) as file:
+    with open("network/coauthor_network_edge.csv") as file:
         reader = csv.DictReader(file)
         for edge in reader:
             if edge["Source"] == prof_key[1] or edge["Target"] == prof_key[1]:
