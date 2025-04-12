@@ -54,6 +54,8 @@ def build_indices(data):
     )
 
     tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+    # for feature in tfidf_vectorizer.get_feature_names_out():
+    #     print(feature)
     publications_to_idx = {pub : idx for idx, pub in enumerate(corpus)}
 
     svd = TruncatedSVD(n_components=100)
