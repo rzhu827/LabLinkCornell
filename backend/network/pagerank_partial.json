@@ -1,0 +1,237 @@
+[
+    {
+        "id":"-Gp8ghkAAAAJ",
+        "name":"Abe Davis",
+        "pagerank_value":0.0052506539
+    },
+    {
+        "id":"Rh16nsIAAAAJ",
+        "name":"Kavita Bala",
+        "pagerank_value":0.043360524
+    },
+    {
+        "id":"llo3F3QAAAAJ",
+        "name":"Steve Marschner",
+        "pagerank_value":0.034261853
+    },
+    {
+        "id":"ovlpa_IAAAAJ",
+        "name":"Andrew C. Myers",
+        "pagerank_value":0.032233343
+    },
+    {
+        "id":"Ormag-QAAAAJ",
+        "name":"David Gries",
+        "pagerank_value":0.0121202026
+    },
+    {
+        "id":"3_WYcR4AAAAJ",
+        "name":"Deborah Estrin",
+        "pagerank_value":0.0174930945
+    },
+    {
+        "id":"LV1qWjgAAAAJ",
+        "name":"Dexter Kozen",
+        "pagerank_value":0.029879465
+    },
+    {
+        "id":"Dswus94AAAAJ",
+        "name":"Greg Morrisett",
+        "pagerank_value":0.0139695795
+    },
+    {
+        "id":"0zrqo3B-66wC",
+        "name":"Hakim Weatherspoon",
+        "pagerank_value":0.027203456
+    },
+    {
+        "id":"I-rKkyEAAAAJ",
+        "name":"Kenneth P. Birman",
+        "pagerank_value":0.0457396003
+    },
+    {
+        "id":"TIGS4c8AAAAJ",
+        "name":"Lorenzo Alvisi",
+        "pagerank_value":0.005709462
+    },
+    {
+        "id":"e1iAhHQAAAAJ",
+        "name":"Mark Campbell",
+        "pagerank_value":0.0419830795
+    },
+    {
+        "id":"AH5j40kAAAAJ",
+        "name":"Nate Foster",
+        "pagerank_value":0.0237316986
+    },
+    {
+        "id":"zkvW8FQAAAAJ",
+        "name":"Robert Kleinberg",
+        "pagerank_value":0.0427855564
+    },
+    {
+        "id":"VqOc5C8AAAAJ",
+        "name":"Anil Damle",
+        "pagerank_value":0.0042824476
+    },
+    {
+        "id":"04TuVhEAAAAJ",
+        "name":"David Bindel",
+        "pagerank_value":0.0158978467
+    },
+    {
+        "id":"VX7d5EQAAAAJ",
+        "name":"Jon Kleinberg",
+        "pagerank_value":0.0747605681
+    },
+    {
+        "id":"BaArKOYAAAAJ",
+        "name":"Anil Nerode",
+        "pagerank_value":0.009455326
+    },
+    {
+        "id":"uf0D-uoAAAAJ",
+        "name":"Ari Juels",
+        "pagerank_value":0.0115493295
+    },
+    {
+        "id":"MGVrVSIAAAAJ",
+        "name":"Thomas Ristenpart",
+        "pagerank_value":0.0185026244
+    },
+    {
+        "id":"pJ28HA0AAAAJ",
+        "name":"Bart Selman",
+        "pagerank_value":0.0114599682
+    },
+    {
+        "id":"duOys3YAAAAJ",
+        "name":"Hadas Kress-Gazit",
+        "pagerank_value":0.0329256441
+    },
+    {
+        "id":"VrgmnEcAAAAJ",
+        "name":"Haym Hirsh",
+        "pagerank_value":0.0060471581
+    },
+    {
+        "id":"5tk1PV8AAAAJ",
+        "name":"Thorsten Joachims",
+        "pagerank_value":0.0713615077
+    },
+    {
+        "id":"TpglobcAAAAJ",
+        "name":"Bharath Hariharan",
+        "pagerank_value":0.0209340519
+    },
+    {
+        "id":"v7EjGHkAAAAJ",
+        "name":"Christopher De Sa",
+        "pagerank_value":0.0166996376
+    },
+    {
+        "id":"oBldxf0AAAAJ",
+        "name":"Hadar Averbuch-Elor",
+        "pagerank_value":0.0106563037
+    },
+    {
+        "id":"70vJVxcAAAAJ",
+        "name":"Jayadev Acharya",
+        "pagerank_value":0.0060511712
+    },
+    {
+        "id":"MIg7a1F-1yMC",
+        "name":"Matthew Eichhorn",
+        "pagerank_value":0.005375295
+    },
+    {
+        "id":"ex9BQiIAAAAJ",
+        "name":"Claire Cardie",
+        "pagerank_value":0.0397691606
+    },
+    {
+        "id":"njczUPMAAAAJ",
+        "name":"Cristian Danescu-Niculescu-Mizil",
+        "pagerank_value":0.048012915
+    },
+    {
+        "id":"oJESe-cAAAAJ",
+        "name":"Lillian Lee",
+        "pagerank_value":0.063513079
+    },
+    {
+        "id":"IeqjwlIAAAAJ",
+        "name":"Mor Naaman",
+        "pagerank_value":0.0121879607
+    },
+    {
+        "id":"XuQW7ogAAAAJ",
+        "name":"Yoav Artzi",
+        "pagerank_value":0.00925357
+    },
+    {
+        "id":"uBFV6SUAAAAJ",
+        "name":"David Mimno",
+        "pagerank_value":0.0241317422
+    },
+    {
+        "id":"8Lp0W54AAAAJ",
+        "name":"Ramin Zabih",
+        "pagerank_value":0.0154914515
+    },
+    {
+        "id":"FJ7im7AAAAAJ",
+        "name":"Immanuel Trummer",
+        "pagerank_value":0.0037947854
+    },
+    {
+        "id":"pOd2M64AAAAJ",
+        "name":"David P. Williamson",
+        "pagerank_value":0.0102725093
+    },
+    {
+        "id":"_kqpoHIAAAAJ",
+        "name":"Siddhartha Banerjee",
+        "pagerank_value":0.00826701
+    },
+    {
+        "id":"-pyztDMAAAAJ",
+        "name":"Tanzeem Choudhury",
+        "pagerank_value":0.0118869889
+    },
+    {
+        "id":"3ixInr8AAAAJ",
+        "name":"Fengqi You",
+        "pagerank_value":0.0093343366
+    },
+    {
+        "id":"K2WfIlsAAAAJ",
+        "name":"Nathan Kallus",
+        "pagerank_value":0.0222830344
+    },
+    {
+        "id":"vQrFgocAAAAJ",
+        "name":"Florentina Bunea",
+        "pagerank_value":0.0036389921
+    },
+    {
+        "id":"ZocLOAMAAAAJ",
+        "name":"Guy Hoffman",
+        "pagerank_value":0.0087087143
+    },
+    {
+        "id":"ESJILIEAAAAJ",
+        "name":"Kirstin Petersen",
+        "pagerank_value":0.0079153426
+    },
+    {
+        "id":"jNQlAkoAAAAJ",
+        "name":"Shiri Azenkot",
+        "pagerank_value":0.0047011266
+    },
+    {
+        "id":"6c5cf1wAAAAJ",
+        "name":"Phoebe Sengers",
+        "pagerank_value":0.0051568326
+    }
+]
