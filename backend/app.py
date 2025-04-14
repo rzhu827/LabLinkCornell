@@ -17,6 +17,8 @@ CORS(app)
 data = load_data()
 build_indices(data)
 
+MAX_DOC_SCORE_CONTRIBUTION = 0.4
+
 abbreviations = {
     "3D": "Three-Dimensional",
     "A/D": "Analog-to-Digital",
@@ -254,19 +256,51 @@ def process_citation_range(citation_range):
 #             prof_key = indices.prof_index_map[idx]
 #             prof_scores[prof_key]['publication_score'] += similarity
 
-def score_by_publications_lsi(query_vector, prof_scores):
-    prof_scores_list = defaultdict(list)
-    query_lsi = indices.svd.transform(query_vector)
+# def score_by_publications_lsi(query_vector, prof_scores):
+#     prof_scores_list = defaultdict(list)
+#     query_lsi = indices.svd.transform(query_vector)
 
+#     similarities = cosine_similarity(query_lsi, indices.lsi_matrix).flatten()
+
+#     for doc_index, score in enumerate(similarities):
+#         prof_key = indices.prof_index_map[doc_index]
+#         prof_scores_list[prof_key].append(score)
+
+#     for key, scores in prof_scores_list.items():
+#         prof_scores_list[key].sort()
+#         prof_scores[key]['publication_score'] = sum(scores[-10:])
+
+def score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_scores):
+    """
+    Score professors based on LSI publication relevance, with balanced per-term contribution.
+    """
+    query_lsi = indices.svd.transform(query_vector)
     similarities = cosine_similarity(query_lsi, indices.lsi_matrix).flatten()
 
-    for doc_index, score in enumerate(similarities):
-        prof_key = indices.prof_index_map[doc_index]
-        prof_scores_list[prof_key].append(score)
+    term_weights = defaultdict(lambda: defaultdict(float))  # term -> prof_key -> score
 
-    for key, scores in prof_scores_list.items():
-        prof_scores_list[key].sort()
-        prof_scores[key]['publication_score'] = sum(scores[-10:])
+    for term in query_terms_set:
+        if term not in indices.tfidf_vectorizer.vocabulary_:
+            continue
+
+        term_col_idx = indices.tfidf_vectorizer.vocabulary_[term]
+        term_column = indices.tfidf_matrix[:, term_col_idx]
+        doc_indices = term_column.nonzero()[0]
+
+        for doc_index in doc_indices:
+            prof_key = indices.prof_index_map[doc_index]
+            doc_score = similarities[doc_index]
+            term_weights[term][prof_key] += doc_score
+
+    for term, prof_scores_map in term_weights.items():
+        if not prof_scores_map:
+            continue
+        max_score = max(prof_scores_map.values())
+        if max_score == 0:
+            continue
+        for prof_key, score in prof_scores_map.items():
+            normalized_score = score / max_score
+            prof_scores[prof_key]['publication_score'] += normalized_score
 
 
 def score_by_interests(query_terms, prof_scores):
@@ -281,27 +315,27 @@ def score_by_interests(query_terms, prof_scores):
         similarity = calculate_jaccard_similarity(query_terms, prof_interests)
         prof_scores[prof_key]['interest_score'] = similarity
 
-def score_by_citations(citation_low, citation_high, prof_scores):
-    """
-    Score professors based on citation counts within range. 
-    Normalized to make sure higher citation counts are not unfairly weighed higher
-    If citations not in range, still considered but penalized 
-    """
-    max_citations = max(indices.prof_to_citations.values()) if indices.prof_to_citations else 1
+# def score_by_citations(citation_low, citation_high, prof_scores):
+#     """
+#     Score professors based on citation counts within range. 
+#     Normalized to make sure higher citation counts are not unfairly weighed higher
+#     If citations not in range, still considered but penalized 
+#     """
+#     max_citations = max(indices.prof_to_citations.values()) if indices.prof_to_citations else 1
     
-    for prof_key, citations in indices.prof_to_citations.items():
-        normalized_score = citations / max_citations
-        if citation_low <= citations <= citation_high:
-            prof_scores[prof_key]['citation_score'] = normalized_score
-        else:
-            prof_scores[prof_key]['citation_score'] = normalized_score * 0.5 #If not in range, less weight
+#     for prof_key, citations in indices.prof_to_citations.items():
+#         normalized_score = citations / max_citations
+#         if citation_low <= citations <= citation_high:
+#             prof_scores[prof_key]['citation_score'] = normalized_score
+#         else:
+#             prof_scores[prof_key]['citation_score'] = normalized_score * 0.5 #If not in range, less weight
 
 def calculate_final_scores(prof_scores):
     """Calculate final weighted scores with different weights."""
     weights = {
-        'publication_score': 0.5,  # 50% weight to publications
+        'publication_score': 0.7,  # 70% weight to publications
         'interest_score': 0.3,     # 30% weight to interests
-        'citation_score': 0.2      # 20% weight to citations
+        # 'citation_score': 0.2      # 20% weight to citations
     }
     for prof_key, scores in prof_scores.items():
         total_score = sum(scores[factor] * weights[factor] for factor in weights)
@@ -381,22 +415,29 @@ def combined_search(query, citation_range=None):
     prof_scores = defaultdict(lambda: {
         'publication_score': 0,  # TF-IDF
         'interest_score': 0,     # Jaccard similarity
-        'citation_score': 0,     # Normalized citations
+        # 'citation_score': 0,     # Normalized citations
         'total_score': 0         # Weighted combination
     })
     
     citation_low, citation_high = process_citation_range(citation_range)
     
     # score_by_publications(query_vector_array, prof_scores)
-    score_by_publications_lsi(query_vector, prof_scores)
+    # score_by_publications_lsi(query_vector, prof_scores)
+    score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_scores)
     score_by_interests(query_terms_set, prof_scores)  # utilizes token set
-    score_by_citations(citation_low, citation_high, prof_scores)
+    # score_by_citations(citation_low, citation_high, prof_scores)
 
     calculate_final_scores(prof_scores)
 
+    # filter profs based on citation range
+    filtered_prof_scores = {
+        prof_key: scores for prof_key, scores in prof_scores.items()
+        if citation_low <= indices.prof_to_citations[prof_key] <= citation_high
+    }
+
     # print(prof_scores) #debugginggg 
     ranked_profs = sorted(
-        [(prof_key, scores) for prof_key, scores in prof_scores.items()],
+        [(prof_key, scores) for prof_key, scores in filtered_prof_scores.items()],
         key=lambda x: x[1]['total_score'],
         reverse=True)[:5]
 
