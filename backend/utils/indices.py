@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
-from sklearn.feature_extraction.text import TfidfVectorizer
-from .preprocessing import custom_tokenizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from utils.preprocessing import custom_tokenizer_stem
 from sklearn.decomposition import TruncatedSVD
 
 
@@ -256,7 +256,7 @@ def build_indices(data):
             processed_publications.append(processed_pub)
             corpus.append(processed_pub)
             prof_index_map[len(corpus) - 1] = prof_key
-            for term in custom_tokenizer(processed_pub):
+            for term in custom_tokenizer_stem(processed_pub):
                 inverted_index[term][prof_key] += 1
         prof_to_publications[prof_key] = processed_publications
 
@@ -265,12 +265,12 @@ def build_indices(data):
         for interest in prof.get("interests", []):
             processed_interest = replace_abbreviations(interest)
             processed_interests.append(processed_interest)
-            for term in custom_tokenizer(processed_interest):
+            for term in custom_tokenizer_stem(processed_interest):
                 interest_index[term].add(prof_key)
         prof_to_interests[prof_key] = processed_interests
     
     tfidf_vectorizer = TfidfVectorizer(
-        tokenizer=custom_tokenizer,     
+        tokenizer=custom_tokenizer_stem,     
         ngram_range=(1, 3),             
         stop_words=None,                
         max_df=0.85,                    
@@ -290,3 +290,10 @@ def build_indices(data):
 
     svd = TruncatedSVD(n_components=100)
     lsi_matrix = svd.fit_transform(tfidf_matrix)
+
+def get_query_terms(query):
+    """Get all n-grams (unigrams to trigrams) present in the query and the TF-IDF vocab."""
+    vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer_stem)
+    vectorizer.fit(corpus)
+    ngram_tokens = vectorizer.build_analyzer()(query)
+    return [term for term in ngram_tokens if term in tfidf_vectorizer.vocabulary_]

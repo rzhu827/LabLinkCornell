@@ -2,9 +2,8 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os, re
 from collections import defaultdict
-from utils.preprocessing import custom_tokenizer
 from utils import indices
-from utils.indices import build_indices, load_data
+from utils.indices import build_indices, load_data, get_query_terms
 from utils.similarity import calculate_jaccard_similarity
 import csv
 from ast import literal_eval
@@ -405,9 +404,10 @@ def combined_search(query, citation_range=None):
     professor interests, publications and citations. 
     Returns list of top 5 professors with their details and top 3 relevant publications.
     """
-    query_terms_set = set(custom_tokenizer(query))
-    if not query_terms_set:
-        return []
+    # query_terms_set = set(custom_tokenizer(query))
+    # if not query_terms_set:
+    #     return []
+    query_terms_set = get_query_terms(query)
     
     # Convert query to TF-IDF vector for publication matching
     query_vector = indices.tfidf_vectorizer.transform([query])
@@ -425,7 +425,7 @@ def combined_search(query, citation_range=None):
     # score_by_publications(query_vector_array, prof_scores)
     # score_by_publications_lsi(query_vector, prof_scores)
     score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_scores)
-    score_by_interests(query_terms_set, prof_scores)  # utilizes token set
+    score_by_interests(query_terms_set, prof_scores)
     # score_by_citations(citation_low, citation_high, prof_scores)
 
     calculate_final_scores(prof_scores)
