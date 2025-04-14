@@ -19,7 +19,7 @@ def custom_tokenizer_stem(text):
     stemmed = [stemmer.stem(token) for token in tokens]  # stem each token
     return [t for t in stemmed if t not in stemmed_stop_words]  # filter out stop words
 
-def custom_tokenizer(text):
+def custom_tokenizer_lemmatize(text):
     """Custom tokenizer for lemmatization"""
     tokens = re.sub(r'[^\w\s]', '', text.lower()).split()
     return [lemmatizer.lemmatize(token) for token in tokens if token not in ENGLISH_STOP_WORDS]
@@ -28,7 +28,7 @@ def preprocess_text(text):
     """Clean and tokenize text."""
 
     # generate ngrams using the custom tokenizer
-    vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer)
+    vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer_lemmatize)
     ngrams = vectorizer.fit_transform([text])  # transform the query text
     # return n-grams and the tokenized version for reference
-    return ngrams, custom_tokenizer(text)
+    return ngrams, custom_tokenizer_lemmatize(text)
