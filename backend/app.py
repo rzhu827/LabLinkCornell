@@ -348,7 +348,8 @@ def get_relevant_publications(prof_key, query_vector):
     for publication in publications:
         pub_vector = indices.tfidf_vectorizer.transform([publication])
         similarity = cosine_similarity(query_vector, pub_vector)[0][0]
-        pub_scores.append((publication, similarity))
+        og_title = indices.cleaned_to_original.get(publication, publication)
+        pub_scores.append((og_title, similarity))
     return [pub for pub, _ in sorted(pub_scores, key=lambda x: x[1], reverse=True)[:3]]
 
 def get_relevant_coauthors(prof_key, query_vector):

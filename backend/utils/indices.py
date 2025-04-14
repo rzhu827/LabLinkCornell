@@ -13,6 +13,7 @@ prof_to_publications = {}                               # {prof_key: [publicatio
 prof_to_interests = {}                                  # {prof_key: [interests]}
 prof_index_map = {}                                     # {doc_index: prof_key}
 profid_to_name = {}                                     # {prof_id: prof_name}
+cleaned_to_original = {}                                # {processed publication: original publication}
 publications_to_idx = None
 corpus = []                                             # All publications for TF-IDF
 tfidf_vectorizer = None
@@ -251,6 +252,7 @@ def build_indices(data):
         processed_publications = []
         for publication in prof.get("publications", []):
             processed_pub = replace_abbreviations(publication)
+            cleaned_to_original[processed_pub] = publication
             processed_publications.append(processed_pub)
             corpus.append(processed_pub)
             prof_index_map[len(corpus) - 1] = prof_key
