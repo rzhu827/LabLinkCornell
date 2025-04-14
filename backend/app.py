@@ -255,13 +255,19 @@ def process_citation_range(citation_range):
 #             prof_scores[prof_key]['publication_score'] += similarity
 
 def score_by_publications_lsi(query_vector, prof_scores):
+    prof_scores_list = defaultdict(list)
     query_lsi = indices.svd.transform(query_vector)
 
     similarities = cosine_similarity(query_lsi, indices.lsi_matrix).flatten()
 
     for doc_index, score in enumerate(similarities):
         prof_key = indices.prof_index_map[doc_index]
-        prof_scores[prof_key]['publication_score'] += score
+        prof_scores_list[prof_key].append(score)
+
+    for key, scores in prof_scores_list.items():
+        prof_scores_list[key].sort()
+        prof_scores[key]['publication_score'] = sum(scores[-10:])
+
 
 def score_by_interests(query_terms, prof_scores):
     """Score professors based on interest relevance using Jaccard similarity."""
