@@ -1,0 +1,114 @@
+,author1,author2,citation_count,author1_id,author2_id
+0,Abe Davis,Kavita Bala,3,#NAME?,Rh16nsIAAAAJ
+1,Abe Davis,Steve Marschner,1,#NAME?,llo3F3QAAAAJ
+2,Andrew C. Myers,David Gries,2,ovlpa_IAAAAJ,Ormag-QAAAAJ
+3,Andrew C. Myers,Deborah Estrin,1,ovlpa_IAAAAJ,3_WYcR4AAAAJ
+4,Andrew C. Myers,Dexter Kozen,12,ovlpa_IAAAAJ,LV1qWjgAAAAJ
+5,Andrew C. Myers,Greg Morrisett,12,ovlpa_IAAAAJ,Dswus94AAAAJ
+6,Andrew C. Myers,Hakim Weatherspoon,1,ovlpa_IAAAAJ,0zrqo3B-66wC
+7,Andrew C. Myers,Kenneth P. Birman,2,ovlpa_IAAAAJ,I-rKkyEAAAAJ
+8,Andrew C. Myers,Lorenzo Alvisi,1,ovlpa_IAAAAJ,TIGS4c8AAAAJ
+9,Andrew C. Myers,Mark Campbell,6,ovlpa_IAAAAJ,e1iAhHQAAAAJ
+10,Andrew C. Myers,Nate Foster,8,ovlpa_IAAAAJ,AH5j40kAAAAJ
+11,Andrew C. Myers,Robert Kleinberg,2,ovlpa_IAAAAJ,zkvW8FQAAAAJ
+12,Anil Damle,David Bindel,1,VqOc5C8AAAAJ,04TuVhEAAAAJ
+13,Anil Damle,Jon Kleinberg,1,VqOc5C8AAAAJ,VX7d5EQAAAAJ
+14,Anil Nerode,David Gries,5,BaArKOYAAAAJ,Ormag-QAAAAJ
+15,Anil Nerode,Dexter Kozen,1,BaArKOYAAAAJ,LV1qWjgAAAAJ
+16,Ari Juels,Lorenzo Alvisi,1,uf0D-uoAAAAJ,TIGS4c8AAAAJ
+17,Ari Juels,Thomas Ristenpart,6,uf0D-uoAAAAJ,MGVrVSIAAAAJ
+18,Bart Selman,Hadas Kress-Gazit,2,pJ28HA0AAAAJ,duOys3YAAAAJ
+19,Bart Selman,Haym Hirsh,2,pJ28HA0AAAAJ,VrgmnEcAAAAJ
+20,Bart Selman,Jon Kleinberg,3,pJ28HA0AAAAJ,VX7d5EQAAAAJ
+21,Bart Selman,Thorsten Joachims,8,pJ28HA0AAAAJ,5tk1PV8AAAAJ
+22,Bharath Hariharan,Christopher De Sa,4,TpglobcAAAAJ,v7EjGHkAAAAJ
+23,Bharath Hariharan,Hadar Averbuch-Elor,1,TpglobcAAAAJ,oBldxf0AAAAJ
+24,Bharath Hariharan,Kavita Bala,2,TpglobcAAAAJ,Rh16nsIAAAAJ
+25,Bharath Hariharan,Kenneth P. Birman,3,TpglobcAAAAJ,I-rKkyEAAAAJ
+26,Bharath Hariharan,Mark Campbell,15,TpglobcAAAAJ,e1iAhHQAAAAJ
+27,Christopher De Sa,Jayadev Acharya,2,v7EjGHkAAAAJ,70vJVxcAAAAJ
+28,Christopher De Sa,Kenneth P. Birman,5,v7EjGHkAAAAJ,I-rKkyEAAAAJ
+29,Christopher De Sa,Matthew Eichhorn,2,v7EjGHkAAAAJ,MIg7a1F-1yMC
+30,Claire Cardie,Cristian Danescu-Niculescu-Mizil,14,ex9BQiIAAAAJ,njczUPMAAAAJ
+31,Claire Cardie,Jon Kleinberg,2,ex9BQiIAAAAJ,VX7d5EQAAAAJ
+32,Claire Cardie,Lillian Lee,43,ex9BQiIAAAAJ,oJESe-cAAAAJ
+33,Claire Cardie,Mor Naaman,1,ex9BQiIAAAAJ,IeqjwlIAAAAJ
+34,Claire Cardie,Thorsten Joachims,20,ex9BQiIAAAAJ,5tk1PV8AAAAJ
+35,Claire Cardie,Yoav Artzi,3,ex9BQiIAAAAJ,XuQW7ogAAAAJ
+36,Cristian Danescu-Niculescu-Mizil,David Mimno,6,njczUPMAAAAJ,uBFV6SUAAAAJ
+37,Cristian Danescu-Niculescu-Mizil,Jon Kleinberg,29,njczUPMAAAAJ,VX7d5EQAAAAJ
+38,Cristian Danescu-Niculescu-Mizil,Lillian Lee,41,njczUPMAAAAJ,oJESe-cAAAAJ
+39,Cristian Danescu-Niculescu-Mizil,Mor Naaman,4,njczUPMAAAAJ,IeqjwlIAAAAJ
+40,Cristian Danescu-Niculescu-Mizil,Thomas Ristenpart,2,njczUPMAAAAJ,MGVrVSIAAAAJ
+41,Cristian Danescu-Niculescu-Mizil,Thorsten Joachims,1,njczUPMAAAAJ,5tk1PV8AAAAJ
+42,David Bindel,David Mimno,10,04TuVhEAAAAJ,uBFV6SUAAAAJ
+43,David Bindel,Jon Kleinberg,3,04TuVhEAAAAJ,VX7d5EQAAAAJ
+44,David Bindel,Kavita Bala,1,04TuVhEAAAAJ,Rh16nsIAAAAJ
+45,David Bindel,Kenneth P. Birman,1,04TuVhEAAAAJ,I-rKkyEAAAAJ
+46,David Bindel,Ramin Zabih,1,04TuVhEAAAAJ,8Lp0W54AAAAJ
+47,David Bindel,Steve Marschner,3,04TuVhEAAAAJ,llo3F3QAAAAJ
+48,David Bindel,Thorsten Joachims,1,04TuVhEAAAAJ,5tk1PV8AAAAJ
+49,David Gries,Kenneth P. Birman,2,Ormag-QAAAAJ,I-rKkyEAAAAJ
+50,David Mimno,Hadar Averbuch-Elor,1,uBFV6SUAAAAJ,oBldxf0AAAAJ
+51,David Mimno,Immanuel Trummer,1,uBFV6SUAAAAJ,FJ7im7AAAAAJ
+52,David Mimno,Jon Kleinberg,2,uBFV6SUAAAAJ,VX7d5EQAAAAJ
+53,David Mimno,Lillian Lee,8,uBFV6SUAAAAJ,oJESe-cAAAAJ
+54,David Mimno,Thorsten Joachims,5,uBFV6SUAAAAJ,5tk1PV8AAAAJ
+55,David Mimno,Yoav Artzi,1,uBFV6SUAAAAJ,XuQW7ogAAAAJ
+56,David P. Williamson,Jon Kleinberg,2,pOd2M64AAAAJ,VX7d5EQAAAAJ
+57,David P. Williamson,Ramin Zabih,1,pOd2M64AAAAJ,8Lp0W54AAAAJ
+58,David P. Williamson,Robert Kleinberg,8,pOd2M64AAAAJ,zkvW8FQAAAAJ
+59,David P. Williamson,Siddhartha Banerjee,2,pOd2M64AAAAJ,_kqpoHIAAAAJ
+60,David P. Williamson,Thorsten Joachims,1,pOd2M64AAAAJ,5tk1PV8AAAAJ
+61,Deborah Estrin,Jayadev Acharya,1,3_WYcR4AAAAJ,70vJVxcAAAAJ
+62,Deborah Estrin,Jon Kleinberg,2,3_WYcR4AAAAJ,VX7d5EQAAAAJ
+63,Deborah Estrin,Kavita Bala,1,3_WYcR4AAAAJ,Rh16nsIAAAAJ
+64,Deborah Estrin,Mor Naaman,1,3_WYcR4AAAAJ,IeqjwlIAAAAJ
+65,Deborah Estrin,Tanzeem Choudhury,5,3_WYcR4AAAAJ,#NAME?
+66,Deborah Estrin,Thomas Ristenpart,1,3_WYcR4AAAAJ,MGVrVSIAAAAJ
+67,Deborah Estrin,Thorsten Joachims,10,3_WYcR4AAAAJ,5tk1PV8AAAAJ
+68,Dexter Kozen,Greg Morrisett,7,LV1qWjgAAAAJ,Dswus94AAAAJ
+69,Dexter Kozen,Jon Kleinberg,3,LV1qWjgAAAAJ,VX7d5EQAAAAJ
+70,Dexter Kozen,Nate Foster,22,LV1qWjgAAAAJ,AH5j40kAAAAJ
+71,Dexter Kozen,Robert Kleinberg,2,LV1qWjgAAAAJ,zkvW8FQAAAAJ
+72,Fengqi You,Nathan Kallus,12,3ixInr8AAAAJ,K2WfIlsAAAAJ
+73,Florentina Bunea,Jon Kleinberg,1,vQrFgocAAAAJ,VX7d5EQAAAAJ
+74,Guy Hoffman,Hadas Kress-Gazit,7,ZocLOAMAAAAJ,duOys3YAAAAJ
+75,Guy Hoffman,Kirstin Petersen,1,ZocLOAMAAAAJ,ESJILIEAAAAJ
+76,Hadar Averbuch-Elor,Lillian Lee,1,oBldxf0AAAAJ,oJESe-cAAAAJ
+77,Hadar Averbuch-Elor,Shiri Azenkot,1,oBldxf0AAAAJ,jNQlAkoAAAAJ
+78,Hadar Averbuch-Elor,Yoav Artzi,2,oBldxf0AAAAJ,XuQW7ogAAAAJ
+79,Hadas Kress-Gazit,Kirstin Petersen,3,duOys3YAAAAJ,ESJILIEAAAAJ
+80,Hadas Kress-Gazit,Mark Campbell,31,duOys3YAAAAJ,e1iAhHQAAAAJ
+81,Hakim Weatherspoon,Kenneth P. Birman,41,0zrqo3B-66wC,I-rKkyEAAAAJ
+82,Hakim Weatherspoon,Nate Foster,3,0zrqo3B-66wC,AH5j40kAAAAJ
+83,Haym Hirsh,Kavita Bala,3,VrgmnEcAAAAJ,Rh16nsIAAAAJ
+84,Jon Kleinberg,Kenneth P. Birman,16,VX7d5EQAAAAJ,I-rKkyEAAAAJ
+85,Jon Kleinberg,Lillian Lee,26,VX7d5EQAAAAJ,oJESe-cAAAAJ
+86,Jon Kleinberg,Mor Naaman,2,VX7d5EQAAAAJ,IeqjwlIAAAAJ
+87,Jon Kleinberg,Nathan Kallus,5,VX7d5EQAAAAJ,K2WfIlsAAAAJ
+88,Jon Kleinberg,Ramin Zabih,8,VX7d5EQAAAAJ,8Lp0W54AAAAJ
+89,Jon Kleinberg,Robert Kleinberg,17,VX7d5EQAAAAJ,zkvW8FQAAAAJ
+90,Jon Kleinberg,Thorsten Joachims,20,VX7d5EQAAAAJ,5tk1PV8AAAAJ
+91,Kavita Bala,Mark Campbell,3,Rh16nsIAAAAJ,e1iAhHQAAAAJ
+92,Kavita Bala,Ramin Zabih,4,Rh16nsIAAAAJ,8Lp0W54AAAAJ
+93,Kavita Bala,Steve Marschner,54,Rh16nsIAAAAJ,llo3F3QAAAAJ
+94,Kenneth P. Birman,Lorenzo Alvisi,1,I-rKkyEAAAAJ,TIGS4c8AAAAJ
+95,Kenneth P. Birman,Nate Foster,1,I-rKkyEAAAAJ,AH5j40kAAAAJ
+96,Kenneth P. Birman,Robert Kleinberg,1,I-rKkyEAAAAJ,zkvW8FQAAAAJ
+97,Kirstin Petersen,Mark Campbell,3,ESJILIEAAAAJ,e1iAhHQAAAAJ
+98,Lillian Lee,Ramin Zabih,1,oJESe-cAAAAJ,8Lp0W54AAAAJ
+99,Lillian Lee,Thorsten Joachims,10,oJESe-cAAAAJ,5tk1PV8AAAAJ
+100,Lillian Lee,Yoav Artzi,3,oJESe-cAAAAJ,XuQW7ogAAAAJ
+101,Mor Naaman,Tanzeem Choudhury,1,IeqjwlIAAAAJ,#NAME?
+102,Mor Naaman,Thomas Ristenpart,4,IeqjwlIAAAAJ,MGVrVSIAAAAJ
+103,Nate Foster,Robert Kleinberg,4,AH5j40kAAAAJ,zkvW8FQAAAAJ
+104,Nathan Kallus,Thorsten Joachims,20,K2WfIlsAAAAJ,5tk1PV8AAAAJ
+105,Phoebe Sengers,Tanzeem Choudhury,1,6c5cf1wAAAAJ,#NAME?
+106,Phoebe Sengers,Thomas Ristenpart,1,6c5cf1wAAAAJ,MGVrVSIAAAAJ
+107,Ramin Zabih,Robert Kleinberg,2,8Lp0W54AAAAJ,zkvW8FQAAAAJ
+108,Ramin Zabih,Thorsten Joachims,9,8Lp0W54AAAAJ,5tk1PV8AAAAJ
+109,Robert Kleinberg,Siddhartha Banerjee,8,zkvW8FQAAAAJ,_kqpoHIAAAAJ
+110,Robert Kleinberg,Tanzeem Choudhury,3,zkvW8FQAAAAJ,#NAME?
+111,Robert Kleinberg,Thorsten Joachims,29,zkvW8FQAAAAJ,5tk1PV8AAAAJ
+112,Tanzeem Choudhury,Thorsten Joachims,2,#NAME?,5tk1PV8AAAAJ
