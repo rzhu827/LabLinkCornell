@@ -3,6 +3,7 @@ from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from utils.preprocessing import custom_tokenizer_lemmatize
 from sklearn.decomposition import TruncatedSVD
+import time
 
 
 # GLOBAL VARIABLES
@@ -17,6 +18,7 @@ cleaned_to_original = {}                                # {processed publication
 publications_to_idx = None
 corpus = []                                             # All publications for TF-IDF
 tfidf_vectorizer = None
+count_vectorizer = None
 tfidf_matrix = None
 svd = None
 lsi_matrix = None
@@ -241,8 +243,9 @@ def load_data():
         return json.load(f)
 
 def build_indices(data):
-    global tfidf_vectorizer, tfidf_matrix, publications_to_idx, svd, lsi_matrix
+    global tfidf_vectorizer, tfidf_matrix, publications_to_idx, svd, lsi_matrix, count_vectorizer
 
+    loop_start = time.time()
     for prof in data:
         prof_key = (prof["name"], prof["id"])
         profid_to_name[prof["id"]] = prof["name"]
@@ -268,7 +271,9 @@ def build_indices(data):
             for term in custom_tokenizer_lemmatize(processed_interest):
                 interest_index[term].add(prof_key)
         prof_to_interests[prof_key] = processed_interests
-    
+    loop_end = time.time()
+    print(f"loop time: {loop_end - loop_start:.4f}")
+
     tfidf_vectorizer = TfidfVectorizer(
         tokenizer=custom_tokenizer_lemmatize,     
         ngram_range=(1, 3),             
@@ -278,22 +283,32 @@ def build_indices(data):
         norm='l2'                       
     )
 
+    vectorize_start = time.time()
     tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
-    
+    vectorize_end = time.time()
+    print(f"vectorize time: {vectorize_end - vectorize_start:.4f}")
+
     # Create publications_to_idx mapping using both original and processed titles
+    loop2_start = time.time()
     publications_to_idx = {}
     for prof in data:
         for orig_pub, proc_pub in zip(prof.get("publications", []), prof_to_publications[(prof["name"], prof["id"])]):
             idx = corpus.index(proc_pub)
             publications_to_idx[orig_pub] = idx
             publications_to_idx[proc_pub] = idx
+    loop2_end = time.time()
+    print(f"loop2 time: {loop2_end - loop2_start:.4f}")
 
+    lsi_start = time.time()
     svd = TruncatedSVD(n_components=100)
     lsi_matrix = svd.fit_transform(tfidf_matrix)
+    lsi_end = time.time()
+    print(f"lsi time: {lsi_end - lsi_start:.4f}")
+
+    count_vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer_lemmatize)
+    count_vectorizer.fit(corpus)
 
 def get_query_terms(query):
     """Get all n-grams (unigrams to trigrams) present in the query and the TF-IDF vocab."""
-    vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer_lemmatize)
-    vectorizer.fit(corpus)
-    ngram_tokens = vectorizer.build_analyzer()(query)
+    ngram_tokens = count_vectorizer.build_analyzer()(query)
     return [term for term in ngram_tokens if term in tfidf_vectorizer.vocabulary_]
