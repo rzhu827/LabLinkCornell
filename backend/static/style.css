@@ -88,6 +88,7 @@ body {
 
 /* citation menu */
 .dropdown {
+    margin-left: 40px;
     position: relative;
     display: inline-block;
 }
@@ -112,7 +113,7 @@ body {
     background: #cadce9;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
-    width: 160px;
+    width: 130px;
     top: 30px;
     right: 0;
     z-index: 10;
@@ -138,7 +139,7 @@ body {
 
 .arrow {
     display: inline-block;
-    transition: transform 0.3s ease;
+    transition: transform 0.1s ease;
     color: #cadce9;
     font-size: 10px;
     margin-left: 5px;
@@ -164,6 +165,38 @@ body {
     margin-top: 4px;
     margin-left: 15px;
     margin-right: 6px;
+}
+
+/* suggestions box */
+.suggestions-box {
+    margin-top: 200px;
+    margin-right: 195px;
+    position: absolute;
+    background-color: rgba(96, 117, 164, 0.249);
+    color: #85abc8;
+    width: 445px;
+    border-radius: 10px 10px 10px 10px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.suggestion-item:hover {
+    background-color: rgba(76, 99, 148, 0.372);
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* NO result output */
+.no-results-message {
+    color: #617CC7;
+    font-size: 16px;
+    margin-top: 100px;
+    text-align: center;
 }
 
 /* result output */
@@ -192,6 +225,7 @@ body {
     height: 0.5px;
     background-color: #aec3d2;
     margin-bottom: 40px;
+    width: 940px;
 }
 
 .professor-header {

@@ -6,6 +6,7 @@
 <link
     href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;700&family=Kanit&family=Montserrat&display=swap"
     rel="stylesheet">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icon.png') }}">
 
 <body>
     <div class="full-body-container">
@@ -40,6 +41,9 @@
                     <img src="{{ url_for('static', filename='images/search 2.png') }}" alt="Search">
                 </button>
             </div>
+
+            <!-- suggestions box -->
+            <div class="suggestions-box" id="suggestions-box"></div>
         </div>
 
         <!-- results -->
@@ -85,6 +89,41 @@
                 }
             });
 
+            const suggestions_box = document.getElementById("suggestions-box");
+
+            // Suggestion dropdown on user typing
+            search_input.addEventListener("input", function () {
+                const full_input = this.value;
+                const words = full_input.split(/\s+/);
+                const current_word = words[words.length - 1]; // last word only
+
+                if (current_word.length === 0) {
+                    suggestions_box.style.display = "none";
+                    return;
+                }
+
+                fetch("/suggest?" + new URLSearchParams({ input: current_word }))
+                    .then(response => response.json())
+                    .then(suggestions => {
+                        if (suggestions.length === 0) {
+                            suggestions_box.style.display = "none";
+                            return;
+                        }
+
+                        suggestions_box.innerHTML = suggestions.map(s => `<div class="suggestion-item">${s}</div>`).join('');
+                        suggestions_box.style.display = "block";
+
+                        document.querySelectorAll(".suggestion-item").forEach(item => {
+                            item.addEventListener("click", () => {
+                                // replace last word with suggestion
+                                words[words.length - 1] = item.textContent;
+                                search_input.value = words.join(" ");
+                                suggestions_box.style.display = "none";
+                            });
+                        });
+                    });
+            });
+
             const citation_btn = document.getElementById("citation-btn");
             const dropdown = document.querySelector(".dropdown");
             const arrow = citation_btn.querySelector(".arrow");
@@ -116,6 +155,12 @@
 
 
         function answerBoxTemplate(index, name, id, affiliation, interests, citations, publications, coauthors) {
+            interests = Array.isArray(interests) ? interests : [];
+            publications = Array.isArray(publications) ? publications : [];
+            coauthors = Array.isArray(coauthors) ? coauthors : [];
+            affiliation = affiliation || "No affiliation listed";
+            citations = citations || 0;
+
             return `<div class='professor-entry'>
                 <div class='divider-line'></div>
                 <div class='professor-header'>
@@ -176,7 +221,22 @@
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.length === 0) {
-                        document.getElementById("answer-box").innerHTML = "<p>No results found.</p>";
+                        const box = document.getElementById("answer-box");
+                        box.innerHTML = "";
+
+                        const wrapper = document.createElement("div");
+                        wrapper.style.paddingTop = "32px";  // match .professor-entry
+
+                        const divider = document.createElement("div");
+                        divider.classList.add("divider-line");
+
+                        const p = document.createElement("p");
+                        p.textContent = "No relevant results found.";
+                        p.classList.add("no-results-message");
+
+                        wrapper.appendChild(divider);
+                        wrapper.appendChild(p);
+                        box.appendChild(wrapper);
                         return;
                     }
 

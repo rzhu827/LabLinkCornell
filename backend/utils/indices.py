@@ -274,7 +274,7 @@ def build_indices(data):
         ngram_range=(1, 3),             
         stop_words=None,                
         max_df=0.85,                    
-        min_df=2,                       
+        min_df=1,                       
         norm='l2'                       
     )
 

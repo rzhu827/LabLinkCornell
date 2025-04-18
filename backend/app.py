@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os, re
 from collections import defaultdict
-from utils import indices
+from utils import indices, preprocessing
 from utils.indices import build_indices, load_data, get_query_terms
 from utils.similarity import calculate_jaccard_similarity
 import csv
@@ -436,96 +436,34 @@ def combined_search(query, citation_range=None):
         if citation_low <= indices.prof_to_citations[prof_key] <= citation_high
     }
 
-    # print(prof_scores) #debugginggg 
+    print(prof_scores) #debugginggg 
     ranked_profs = sorted(
         [(prof_key, scores) for prof_key, scores in filtered_prof_scores.items()],
         key=lambda x: x[1]['total_score'],
         reverse=True)[:5]
+    print(ranked_profs)
 
     res = prepare_results(ranked_profs, query_vector)
-    # for prof in res: # debugging
-    #     print(prof["name"])
-    #     print(prof["coauthors"])
-    #     print() 
+    for prof in res: # debugging
+        print(prof["name"])
+        print(prof["coauthors"])
+        print() 
     return res
-
-###################
-# def get_top_publications(prof_data, query_terms):
-#     """
-#     Given a professor's data, returns the top 3 most relevant publications
-#     based on term frequency for the query terms.
-#     """
-#     publication_scores = []  # [ (publication, aggregated_term_freq) ]
-
-#     for publication in prof_data["publications"]:
-#         pub_terms = preprocess_text(publication)
-#         pub_term_to_tf = Counter(pub_terms)
-
-#         pub_score = 0
-#         for term in query_terms:
-#             pub_score += pub_term_to_tf.get(term, 0)
-#         publication_scores.append((publication, pub_score))
-
-#     return sorted(publication_scores, key=lambda x: x[1], reverse=True)[:3]
-
-
-# def tf_ranked_search(query, citation_range):
-#     """
-#     Given a user's input query terms and citation range, returns a ranked set of
-#     top 5 matched professors and their top 3 relevant publications, evaluated
-#     through highest aggregate term frequency for the query terms and relevance
-#     of citation quantity.
-#     """
-#     query_terms = set((re.sub(r'[^\w\s]', '', query)).lower().split())
-#     print("Citation range:", citation_range)  # Debug: print the citation range
-#     if citation_range == "0":  # no preference
-#         citation_low = float('-inf')
-#         citation_high = float('inf')
-#     elif citation_range == "100000":  # 100,000+
-#         citation_low = 100000
-#         citation_high = float('inf')
-#     else:
-#         citation_range = citation_range.split("-")
-#         citation_low = int(re.sub(r'[^\w\s]', '', citation_range[0]))
-#         citation_high = int(re.sub(r'[^\w\s]', '', citation_range[1]))
-
-#     scores = defaultdict(int)  # { prof_key : score }
-
-#     for term in query_terms:
-#         if term in inverted_index:
-#             for prof_key, term_freq in inverted_index[term].items():
-#                 prof_citations = prof_to_citations[prof_key]                
-
-#                 if citation_low <= prof_citations <= citation_high:
-#                     scores[prof_key] += term_freq
-
-#     ranked_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:5]
-
-#     results = []
-#     for prof_key, score in ranked_scores:
-#         prof_name, prof_id = prof_key
-#         prof_citations = prof_to_citations[prof_key]
-#         prof_data = next((p for p in data if p["id"] == prof_id), None)
-
-#         print(f"Score for {prof_name}: {score}")  # Debugging statement
-
-#         if prof_data:
-#             top_publications = get_top_publications(prof_data, query_terms)
-#             results.append({
-#                 "name": prof_name,
-#                 "id": prof_data.get("id", ""),
-#                 "affiliation": prof_data.get("affiliation", "Cornell University"),
-#                 "interests": prof_data.get("interests", []),
-#                 "citations": prof_citations,
-#                 "publications": [pub[0] for pub in top_publications]
-#                 })
-            
-#     return results
-###################
 
 @app.route("/")
 def home():
     return render_template('base.html',title="sample html")
+
+@app.route("/suggest")
+def suggest():
+    user_input = request.args.get("input", "").lower()
+    suggestions = set()
+
+    for word in indices.inverted_index:
+        if word.startswith(user_input) and word in preprocessing.english_words:
+            suggestions.add(word)
+
+    return jsonify(sorted(suggestions)[:5])
 
 @app.route('/search')
 def search():
@@ -535,6 +473,7 @@ def search():
     print(replaced_query)
     results = combined_search(replaced_query, citation_range) # Change the algorithm method here
 
+    print(results)
     return jsonify(results)
 
 if 'DB_NAME' not in os.environ:

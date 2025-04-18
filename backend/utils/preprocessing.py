@@ -1,16 +1,19 @@
 import re
 from sklearn.feature_extraction.text import CountVectorizer
 import nltk
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.corpus import words
 nltk.download("wordnet")
 nltk.download("omw-1.4")
+nltk.download("words")
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 stemmer = PorterStemmer()
 stemmed_stop_words = [stemmer.stem(word) for word in ENGLISH_STOP_WORDS]
 
 lemmatizer = WordNetLemmatizer()
+
+english_words = set(w.lower() for w in words.words())
 
 def custom_tokenizer_stem(text):
     """Custom tokenizer for stemming and tokenization."""
