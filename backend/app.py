@@ -2,27 +2,49 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os, re
 from collections import defaultdict
-from utils import indices, preprocessing
-from utils.indices import build_indices, load_data, get_query_terms
+from utils import preprocessing, indices
+from utils.indices import get_query_terms
 from utils.similarity import calculate_jaccard_similarity
 import csv
+from nltk.stem import WordNetLemmatizer
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 import time
 
-
 app = Flask(__name__)
 CORS(app)
 
-load_start=  time.time()
-data = load_data()
-load_end = time.time()
-print(f"load_data(): {(load_end - load_start):.4f} s")
+l = WordNetLemmatizer()
+l.lemmatize("dogs") # warmup the lemmatizer
 
-build_start = time.time()
-build_indices(data)
-build_end = time.time()
-print(f"build_data(): {(build_end - build_start):.4f} s")
+data = indices.load_data() # the ones commented out are unused
+dataset = data["dataset"]
+inverted_index = data["inverted_index"]
+interest_index = data["interest_index"]
+prof_to_citations = data["prof_to_citations"]
+# prof_to_publications = data["prof_to_publications"]
+prof_to_interests = data["prof_to_interests"]
+prof_index_map = data["prof_index_map"]
+profid_to_name = data["profid_to_name"]
+# cleaned_to_original = data["cleaned_to_original"]
+publications_to_idx = data["publications_to_idx"]
+corpus = data["corpus"]
+svd = data["svd"]
+tfidf_vectorizer = data["tfidf_vectorizer"]
+count_vectorizer_analyze = data["count_vectorizer_analyze"]
+tfidf_matrix = data["tfidf_matrix"]
+lsi_matrix = data["lsi_matrix"]
+l = data["dummy"]
+
+# load_start=  time.time()
+# data = load_data()
+# load_end = time.time()
+# print(f"load_data(): {(load_end - load_start):.4f} s")
+
+# build_start = time.time()
+# build_indices(data)
+# build_end = time.time()
+# print(f"build_data(): {(build_end - build_start):.4f} s")
 
 
 MAX_DOC_SCORE_CONTRIBUTION = 0.4
@@ -282,23 +304,23 @@ def score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_score
     """
     Score professors based on LSI publication relevance, with balanced per-term contribution.
     """
-    query_lsi = indices.svd.transform(query_vector)
-    similarities = cosine_similarity(query_lsi, indices.lsi_matrix).flatten()
+    query_lsi = svd.transform(query_vector)
+    similarities = cosine_similarity(query_lsi, lsi_matrix).flatten()
 
     # term_weights = defaultdict(lambda: defaultdict(float))  # term -> prof_key -> score
     prof_to_doc_scores = defaultdict(lambda: defaultdict(float)) # {prof_key : {doc_idx: score}, ...}
 
     for term in query_terms_set:
-        if term not in indices.tfidf_vectorizer.vocabulary_:
+        if term not in tfidf_vectorizer.vocabulary_:
             continue
 
-        term_col_idx = indices.tfidf_vectorizer.vocabulary_[term]
-        term_column = indices.tfidf_matrix[:, term_col_idx]
+        term_col_idx = tfidf_vectorizer.vocabulary_[term]
+        term_column = tfidf_matrix[:, term_col_idx]
         doc_indices = term_column.nonzero()[0]
 
         prof_to_summed_score = defaultdict(float) # {prof_key : score, ...}
         for doc_index in doc_indices:
-            prof_key = indices.prof_index_map[doc_index]
+            prof_key = prof_index_map[doc_index]
             doc_score = similarities[doc_index]
             prof_to_summed_score[prof_key] += doc_score
         
@@ -307,7 +329,7 @@ def score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_score
             continue
 
         for doc_index in doc_indices:
-            prof_key = indices.prof_index_map[doc_index]
+            prof_key = prof_index_map[doc_index]
             normalized_score = similarities[doc_index] / max_score
             prof_to_doc_scores[prof_key][doc_index] += normalized_score
             prof_scores[prof_key]['publication_score'] += normalized_score
@@ -339,11 +361,11 @@ def score_by_interests(query_terms, prof_scores):
     """Score professors based on interest relevance using Jaccard similarity."""
     matching_profs = set()
     for term in query_terms:
-        if term in indices.interest_index:
-            matching_profs.update(indices.interest_index[term])
+        if term in interest_index:
+            matching_profs.update(interest_index[term])
     
     for prof_key in matching_profs:
-        prof_interests = set(" ".join(indices.prof_to_interests[prof_key]).lower().split())
+        prof_interests = set(" ".join(prof_to_interests[prof_key]).lower().split())
         similarity = calculate_jaccard_similarity(query_terms, prof_interests)
         prof_scores[prof_key]['interest_score'] = similarity
 
@@ -385,7 +407,7 @@ def calculate_final_scores(prof_scores):
 #     return [pub for pub, _ in sorted(pub_scores, key=lambda x: x[1], reverse=True)[:3]]
 
 def get_relevant_publications(prof_key, prof_to_doc_scores):
-    return [indices.corpus[doc_idx] for doc_idx, _ in prof_to_doc_scores[prof_key].items()][:3]
+    return [corpus[doc_idx] for doc_idx, _ in prof_to_doc_scores[prof_key].items()][:3]
 
 def get_relevant_coauthors(prof_key, query_vector):
     """Get top 3 most relevant coauthors for a professor using cosine similarity with TF-IDF"""
@@ -403,12 +425,12 @@ def get_relevant_coauthors(prof_key, query_vector):
     
     for prof_id, pubs in profs_to_pubs.items():
         for pub in pubs: 
-            doc_vector = indices.tfidf_matrix[indices.publications_to_idx[pub]]
+            doc_vector = tfidf_matrix[publications_to_idx[pub]]
             sim = cosine_similarity(query_vector, doc_vector)[0][0]
             if sim > 0:
                 prof_scores[prof_id] += sim
 
-    return [(indices.profid_to_name[coauthor], coauthor) for coauthor, _ in sorted(prof_scores.items(), key=lambda x: x[1], reverse=True)[:3]]
+    return [(profid_to_name[coauthor], coauthor) for coauthor, _ in sorted(prof_scores.items(), key=lambda x: x[1], reverse=True)[:3]]
 
 def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
     """Prepare final results with professor details and relevant publications."""
@@ -418,7 +440,7 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
     co_authors_accum = 0
     for prof_key, _ in ranked_profs:
         prof_name, prof_id = prof_key
-        prof_data = next((p for p in data if p["id"] == prof_id), None)
+        prof_data = next((p for p in dataset if p["id"] == prof_id), None)
         
         if prof_data:
             # Get top 3 relevant publications
@@ -434,7 +456,7 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
                 "id": prof_data.get("id", ""),
                 "affiliation": prof_data.get("affiliation", "Cornell University"),
                 "interests": prof_data.get("interests", []),
-                "citations": indices.prof_to_citations[prof_key],
+                "citations": prof_to_citations[prof_key],
                 "publications": relevant_pubs,
                 "coauthors": coauthors
             })
@@ -452,12 +474,12 @@ def combined_search(query, citation_range=None):
     # if not query_terms_set:
     #     return []
     start = time.time()
-    query_terms_set = get_query_terms(query)
+    query_terms_set = get_query_terms(query, count_vectorizer_analyze, tfidf_vectorizer)
     print(f"get_query_terms(): {(time.time() - start):.4f}")
     
     # Convert query to TF-IDF vector for publication matching
     start = time.time()
-    query_vector = indices.tfidf_vectorizer.transform([query])
+    query_vector = tfidf_vectorizer.transform([query])
     print(f"query_vector(): {(time.time() - start):.4f}")
     # query_vector_array = query_vector.toarray()[0]  # raw tfidf scoring
     
@@ -490,7 +512,7 @@ def combined_search(query, citation_range=None):
     start = time.time()
     filtered_prof_scores = {
         prof_key: scores for prof_key, scores in prof_scores.items()
-        if citation_low <= indices.prof_to_citations[prof_key] <= citation_high
+        if citation_low <= prof_to_citations[prof_key] <= citation_high
     }
     print(f"filter prof scores: {(time.time() - start):.4f}")
 
@@ -521,7 +543,7 @@ def suggest():
     user_input = request.args.get("input", "").lower()
     suggestions = set()
 
-    for word in indices.inverted_index:
+    for word in inverted_index:
         if word.startswith(user_input) and word in preprocessing.english_words:
             suggestions.add(word)
 
