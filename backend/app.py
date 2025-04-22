@@ -34,18 +34,6 @@ tfidf_vectorizer = data["tfidf_vectorizer"]
 count_vectorizer_analyze = data["count_vectorizer_analyze"]
 tfidf_matrix = data["tfidf_matrix"]
 lsi_matrix = data["lsi_matrix"]
-l = data["dummy"]
-
-# load_start=  time.time()
-# data = load_data()
-# load_end = time.time()
-# print(f"load_data(): {(load_end - load_start):.4f} s")
-
-# build_start = time.time()
-# build_indices(data)
-# build_end = time.time()
-# print(f"build_data(): {(build_end - build_start):.4f} s")
-
 
 MAX_DOC_SCORE_CONTRIBUTION = 0.4
 
@@ -413,7 +401,7 @@ def get_relevant_coauthors(prof_key, query_vector):
     """Get top 3 most relevant coauthors for a professor using cosine similarity with TF-IDF"""
     profs_to_pubs = {} # {prof_id : [pub1, pub2, ...], ...}
     prof_scores = defaultdict(int) # {prof_id : score}
-    with open("network/coauthor_network_edge.csv") as file:
+    with open("network/coauthor_edgelist.csv") as file:
         reader = csv.DictReader(file)
         for edge in reader:
             if edge["Source"] == prof_key[1] or edge["Target"] == prof_key[1]:

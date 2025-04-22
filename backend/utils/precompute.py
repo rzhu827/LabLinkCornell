@@ -2,7 +2,6 @@ import json
 from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from preprocessing import custom_tokenizer_lemmatize, default_dict_int
-from nltk.stem import WordNetLemmatizer
 from sklearn.decomposition import TruncatedSVD
 import pickle
 import lzma
@@ -299,10 +298,6 @@ def build_indices(data):
     count_vectorizer.fit(corpus)
     # print(f"count_vectorizer: {(time.time() - start):.4f}")
     analyze = count_vectorizer.build_analyzer()
-    dummy = WordNetLemmatizer()
-    # start = time.time()
-    dummy.lemmatize('dogs')
-    # print(f"lemmatize: {(time.time() - start):.4f}")
 
     with lzma.open("precomputed_data.pkl", "wb") as f:
         pickle.dump({"dataset" : data,
@@ -320,8 +315,7 @@ def build_indices(data):
                      "count_vectorizer_analyze" : analyze,
                      "tfidf_matrix" : tfidf_matrix,
                      "svd" : svd,
-                     "lsi_matrix" : lsi_matrix,
-                     "dummy" : dummy}, f)
+                     "lsi_matrix" : lsi_matrix}, f)
 
 if __name__ == "__main__":
     data = load_data()
