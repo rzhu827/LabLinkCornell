@@ -10,6 +10,7 @@ from nltk.stem import WordNetLemmatizer
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 import time
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +35,7 @@ tfidf_vectorizer = data["tfidf_vectorizer"]
 count_vectorizer_analyze = data["count_vectorizer_analyze"]
 tfidf_matrix = data["tfidf_matrix"]
 lsi_matrix = data["lsi_matrix"]
+theme_axes = data["theme_axes"]
 l = data["dummy"]
 
 # load_start=  time.time()
@@ -300,6 +302,19 @@ def process_citation_range(citation_range):
 #         prof_scores_list[key].sort()
 #         prof_scores[key]['publication_score'] = sum(scores[-10:])
 
+
+def score_professor_themes(prof_key):
+    """
+    Compute each professor's 8-theme score.
+    """
+    idxs = [i for i, p in prof_index_map.items() if p == prof_key]  # all docs authored by prof
+    P = lsi_matrix[idxs]
+
+    # compute mean dot-product with each theme axis
+    raw = {theme_id: float(np.dot(P, axis_vec).mean()) for theme_id, axis_vec in theme_axes.items()}
+    mx  = max(raw.values()) or 1.0
+    return {theme_id: raw[theme_id]/mx for theme_id in raw}
+
 def score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_scores):
     """
     Score professors based on LSI publication relevance, with balanced per-term contribution.
@@ -458,7 +473,8 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
                 "interests": prof_data.get("interests", []),
                 "citations": prof_to_citations[prof_key],
                 "publications": relevant_pubs,
-                "coauthors": coauthors
+                "coauthors": coauthors,
+                "theme_scores": score_professor_themes(prof_key)
             })
     print(f"get_relevant_publications(): {rel_pubs_accum:.4f}")
     print(f"get_relevant_coauthors(): {co_authors_accum:.4f}")
@@ -556,6 +572,7 @@ def search():
     replaced_query = replace_abbreviations(query)
     print(replaced_query)
     results = combined_search(replaced_query, citation_range) # Change the algorithm method here
+
 
     print(results)
     return jsonify(results)

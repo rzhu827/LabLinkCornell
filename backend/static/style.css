@@ -203,7 +203,6 @@ body {
 #answer-box {
     margin-top: 151px;
     padding-bottom: 160px;
-    /* Add space for scrolling */
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -212,13 +211,14 @@ body {
 
 .professor-entry {
     position: relative;
-    margin-bottom: 60px;
+    margin-bottom: 70px;
     padding: 32px;
     border-radius: 10px;
     background-color: transparent;
     width: 940px;
     font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, sans-serif;
     color: #aec3d2;
+    transition: transform 0.5s ease;
 }
 
 .divider-line {
@@ -290,7 +290,8 @@ body {
 
 .publications {
     list-style-type: disc;
-    color: #617CC7;
+    /* color: #617CC7; */
+    color: #7b98ea;
     font-size: 16px;
 }
 
@@ -308,7 +309,7 @@ body {
 .citation-count {
     font-size: 14px;
     font-weight: bold;
-    color: #617CC7;
+    color: #7b98ea;
     margin-bottom: 40px;
     align-self: flex-end;
 }
@@ -317,22 +318,76 @@ body {
     display: inline;
     font-size: 16px;
     margin-right: 5px;
-    color: #305CD6;
+    color: #4b7bff;
 }
 
 .coauthors span {
     font-size: 16px;
-    color: #305CD6;
+    color: #4b7bff;
 }
 
 .coauthor-link {
-    color: #305CD6;
+    color: #4b7bff;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .coauthor-link:hover {
-    color: rgb(134, 164, 246);
+    color: rgb(181, 201, 255);
+}
+
+/* profile sidebar */
+.profile-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 440px;
+    height: 100%;
+    padding: 16px;
+    overflow-y: auto;
+    z-index: 1000;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+    background-color: rgba(34, 41, 61, 0.9);
+}
+
+.profile-sidebar.active {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.profile-btn {
+    margin-top: 40px;
+    position: absolute;
+    background-color: #cadce9;
+    color: rgb(28, 51, 102);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-style: bold;
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+
+.profile-btn:hover {
+    background-color: #b8cbff;
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 2;
 }
 
 /* authorship */

@@ -7,6 +7,14 @@ from sklearn.decomposition import TruncatedSVD
 import pickle
 import lzma
 
+# SVD ANALYSIS
+import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# from sklearn.cluster import KMeans
+# import matplotlib.patches as mpatches
+# from collections import Counter
+
 # GLOBAL VARIABLES
 inverted_index = defaultdict(default_dict_int)  # {term: {prof_key: term_freq}}
 interest_index = defaultdict(set)                       # {interest_term: {prof_key1, prof_key2, ...}}
@@ -23,6 +31,10 @@ count_vectorizer = None
 tfidf_matrix = None
 svd = None
 lsi_matrix = None
+theme_axes = {}
+
+# SVD ANALYSIS
+terms = None
 
 # Abbreviations dictionary
 abbreviations = {
@@ -244,7 +256,7 @@ def load_data():
         return json.load(f)
 
 def build_indices(data):
-    global tfidf_vectorizer, tfidf_matrix, publications_to_idx, svd, lsi_matrix, count_vectorizer
+    global tfidf_vectorizer, tfidf_matrix, publications_to_idx, svd, lsi_matrix, count_vectorizer, terms
 
     for prof in data:
         prof_key = (prof["name"], prof["id"])
@@ -282,6 +294,9 @@ def build_indices(data):
     )
 
     tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+    
+    # SVD ANALYSIS
+    terms = tfidf_vectorizer.get_feature_names_out()
 
     # Create publications_to_idx mapping using both original and processed titles
     publications_to_idx = {}
@@ -304,6 +319,23 @@ def build_indices(data):
     dummy.lemmatize('dogs')
     # print(f"lemmatize: {(time.time() - start):.4f}")
 
+    # SVD ANALYSIS
+    theme_keywords = {
+        1: ["network","sensor","model","learning","ml","machine"],  # ML, models, sensors, networks
+        2: ["artificial","intelligence","language", "ai"],  # AI, language
+        3: ["logic","semantics","verification","proof","algebra", "math", "formal", "linear"],  # formal logic, math, algebra
+        4: ["algorithm","optimization","complexity", "computation","theory", "dynamic", "programming"],  # computation, algorithms, programming
+        5: ["social","human","interaction","identity","citizen","community","people","society", "ethics", "law", "moral"],  # social, human
+        6: ["security","market","game","encryption","authentication"],  # security, markets
+        7: ["statistics","analysis","data","modeling","regression","probability","graph"],  # statistics, data, probability
+        8: ["biology","ecology","biodiversity","health","environment","animals","survey","pharmacy","disability"],  # science, health, bio
+    }
+
+    for tid, kws in theme_keywords.items():
+        pseudo = " ".join(kws)
+        tf    = tfidf_vectorizer.transform([pseudo])
+        theme_axes[tid] = svd.transform(tf).flatten()
+
     with lzma.open("precomputed_data.pkl", "wb") as f:
         pickle.dump({"dataset" : data,
                     "inverted_index" : inverted_index, 
@@ -321,9 +353,100 @@ def build_indices(data):
                      "tfidf_matrix" : tfidf_matrix,
                      "svd" : svd,
                      "lsi_matrix" : lsi_matrix,
+                     "theme_axes" : theme_axes,
                      "dummy" : dummy}, f)
+
+def top_terms_for_component(comp_idx, n=5):
+    component = svd.components_[comp_idx]
+    top_idxs = np.argsort(component)[-n:][::-1]
+    return [tfidf_vectorizer.get_feature_names_out()[i] for i in top_idxs]
+
+# def top_titles_for_component(comp_idx, n=5):
+#     comp_vals = lsi_matrix[:, comp_idx]
+#     top_doc_idxs = np.argsort(np.abs(comp_vals))[-n:][::-1]
+#     return [cleaned_to_original[corpus[i]] for i in top_doc_idxs]
+
+# def clustering():
+#     global km
+#     km = KMeans(n_clusters=20, random_state=42)
+#     km.fit(lsi_matrix[:, :20])
+#     centroids = km.cluster_centers_
+
+#     print("\nCluster Centroid Analysis\n")
+#     for cid, center in enumerate(centroids):
+#         top_dims = np.argsort(np.abs(center))[-3:][::-1]
+#         names = [f"LSI_{d+1}" for d in top_dims]
+#         terms = [top_terms_for_component(d, n=5) for d in top_dims]
+#         print(f"Cluster {cid}: top dims = {names}")
+#         for d, tlist in zip(top_dims, terms):
+#             print("  LSI", d+1, "→", tlist)
+#         print()
+
+#     # Count frequency of LSI dimensions
+#     all_dims = []
+#     for center in centroids:
+#         top_dims = np.argsort(np.abs(center))[-3:]
+#         all_dims.extend(top_dims)
+
+#     dim_counts = Counter(all_dims)
+#     most_common_dims = dim_counts.most_common(20)
+
+#     print("\nTop Themes by Cluster Frequency\n")
+#     for dim, freq in most_common_dims:
+#         print(f"LSI {dim+1} (appears in {freq} clusters):")
+#         print("  Top terms:", top_terms_for_component(dim))
+#         print("  Top publications:")
+#         for title in top_titles_for_component(dim):
+#             print("   →", title[:100], "...")
+#         print()
+    
+def inspect_theme_axis(axis_vec, n_components=5, n_terms=5):
+    top_dims = np.argsort(np.abs(axis_vec))[-n_components:][::-1]
+    out = []
+    for d in top_dims:
+        terms = top_terms_for_component(d, n=n_terms)
+        out.append((d+1, terms))
+    return out
+
+def top_docs_for_axis(axis_vec, n=5):
+    scores = lsi_matrix.dot(axis_vec)
+    idxs   = np.argsort(scores)[-n:][::-1]
+    return [cleaned_to_original[corpus[i]] for i in idxs]
+    
+def dims():
+    theme_keywords = {
+        1: ["network","sensor","model","learning","ml","machine"],
+        2: ["artificial","intelligence","language", "ai"],
+        3: ["logic","semantics","verification","proof","algebra", "math", "formal", "linear"], # formal methods and algebra
+        4: ["algorithm","optimization","complexity", "computation","theory", "dynamic", "programming"],
+        5: ["social","human","interaction","identity","citizen","community","people","society", "ethics", "law", "moral"],
+        6: ["security","market","game","encryption","authentication"],
+        7: ["statistics","analysis","data","modeling","regression","probability","graph"],
+        8: ["biology","ecology","biodiversity","health","environment","animals","survey","pharmacy","disability"],
+    }
+
+    # 2) Build each theme’s 100-dim LSI axis
+    for tid, kws in theme_keywords.items():
+        pseudo = " ".join(kws)
+        tf    = tfidf_vectorizer.transform([pseudo])
+        theme_axes[tid] = svd.transform(tf).flatten()
+
+    # 3) Inspect top LSI dims per axis
+    for tid, axis_vec in theme_axes.items():
+        print(f"\nTheme {tid}:", theme_keywords[tid])
+        for dim, terms in inspect_theme_axis(axis_vec, n_components=3, n_terms=5):
+            print(f"  → LSI {dim}: {terms}")
+
+    # 4) Show top documents per axis
+    for tid, axis_vec in theme_axes.items():
+        print(f"\nTheme {tid}: top docs →")
+        for title in top_docs_for_axis(axis_vec, n=5):
+            print("   ", title[:80], "…")
+
 
 if __name__ == "__main__":
     data = load_data()
     build_indices(data)
-
+    # clustering()
+    # analyze_and_export()
+    # dims()
