@@ -2,7 +2,6 @@ import json
 from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from preprocessing import custom_tokenizer_lemmatize, default_dict_int
-from nltk.stem import WordNetLemmatizer
 from sklearn.decomposition import TruncatedSVD
 import pickle
 import lzma
@@ -314,10 +313,6 @@ def build_indices(data):
     count_vectorizer.fit(corpus)
     # print(f"count_vectorizer: {(time.time() - start):.4f}")
     analyze = count_vectorizer.build_analyzer()
-    dummy = WordNetLemmatizer()
-    # start = time.time()
-    dummy.lemmatize('dogs')
-    # print(f"lemmatize: {(time.time() - start):.4f}")
 
     # SVD ANALYSIS
     theme_keywords = {
@@ -353,8 +348,7 @@ def build_indices(data):
                      "tfidf_matrix" : tfidf_matrix,
                      "svd" : svd,
                      "lsi_matrix" : lsi_matrix,
-                     "theme_axes" : theme_axes,
-                     "dummy" : dummy}, f)
+                     "theme_axes" : theme_axes,}, f)
 
 def top_terms_for_component(comp_idx, n=5):
     component = svd.components_[comp_idx]
