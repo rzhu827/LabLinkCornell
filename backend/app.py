@@ -264,6 +264,20 @@ def process_citation_range(citation_range):
         parts = re.sub(r'[^\d\-]', '', citation_range).split("-")
         return int(parts[0]), int(parts[1])
 
+
+def print_lsi_topics(svd_model, tfidf_vectorizer, top_n=10):
+    terms = tfidf_vectorizer.get_feature_names_out()
+    singular_values = svd_model.singular_values_
+    
+    # Order topics by their singular values
+    sorted_topic_indices = sorted(range(len(singular_values)), key=lambda i: singular_values[i], reverse=True)
+
+    for i in sorted_topic_indices[:top_n]:
+        print(f"\nTopic {i} (Singular Value: {singular_values[i]:.4f}):")
+        top_terms = sorted(zip(terms, svd_model.components_[i]), key=lambda x: abs(x[1]), reverse=True)[:top_n]
+        for term, weight in top_terms:
+            print(f"  {term:<20} {weight:.4f}")
+
 # def score_by_publications(query_vector_array, prof_scores):
 #     """Score professors by publication similarity by TF-IDF."""
 #     for idx, doc_vector in enumerate(indices.tfidf_matrix):
@@ -401,7 +415,7 @@ def get_relevant_coauthors(prof_key, query_vector):
     """Get top 3 most relevant coauthors for a professor using cosine similarity with TF-IDF"""
     profs_to_pubs = {} # {prof_id : [pub1, pub2, ...], ...}
     prof_scores = defaultdict(int) # {prof_id : score}
-    with open("network/coauthor_edgelist.csv") as file:
+    with open("network/coauthor_edgelist.csv", encoding="utf-8") as file:
         reader = csv.DictReader(file)
         for edge in reader:
             if edge["Source"] == prof_key[1] or edge["Target"] == prof_key[1]:
@@ -470,6 +484,8 @@ def combined_search(query, citation_range=None):
     query_vector = tfidf_vectorizer.transform([query])
     print(f"query_vector(): {(time.time() - start):.4f}")
     # query_vector_array = query_vector.toarray()[0]  # raw tfidf scoring
+    
+    print_lsi_topics(svd, tfidf_vectorizer, top_n=10) #TRYING TO INTEPRET SVD
     
     prof_scores = defaultdict(lambda: {
         'publication_score': 0,  # TF-IDF
