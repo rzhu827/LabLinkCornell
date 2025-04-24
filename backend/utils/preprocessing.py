@@ -18,7 +18,7 @@ stemmed_stop_words = [stemmer.stem(word) for word in ENGLISH_STOP_WORDS]
 
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
-# english_words = set(w.lower() for w in words.words('english'))
+english_words = set(w.lower() for w in words.words())
 
 def custom_tokenizer_stem(text):
     """Custom tokenizer for stemming and tokenization."""
