@@ -501,7 +501,7 @@ def combined_search(query, citation_range=None):
     print(f"query_vector(): {(time.time() - start):.4f}")
     # query_vector_array = query_vector.toarray()[0]  # raw tfidf scoring
     
-    print_lsi_topics(svd, tfidf_vectorizer, top_n=10) #TRYING TO INTEPRET SVD
+    # print_lsi_topics(svd, tfidf_vectorizer, top_n=10) #TRYING TO INTEPRET SVD
     
     prof_scores = defaultdict(lambda: {
         'publication_score': 0,  # TF-IDF
