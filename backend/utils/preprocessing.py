@@ -5,6 +5,7 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.corpus import words, wordnet, stopwords
 from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
 from collections import defaultdict
+from wordfreq import zipf_frequency
 
 nltk.download("wordnet")
 nltk.download("omw-1.4")
@@ -18,7 +19,7 @@ stemmed_stop_words = [stemmer.stem(word) for word in ENGLISH_STOP_WORDS]
 
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
-english_words = set(w.lower() for w in words.words())
+# english_words = set(w.lower() for w in words.words())
 
 def custom_tokenizer_stem(text):
     """Custom tokenizer for stemming and tokenization."""

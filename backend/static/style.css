@@ -193,7 +193,7 @@ body {
 
 /* NO result output */
 .no-results-message {
-    color: #617CC7;
+    color: #aec3d2;
     font-size: 16px;
     margin-top: 100px;
     text-align: center;
@@ -318,16 +318,16 @@ body {
     display: inline;
     font-size: 16px;
     margin-right: 5px;
-    color: #4b7bff;
+    color: #5784ff;
 }
 
 .coauthors span {
     font-size: 16px;
-    color: #4b7bff;
+    color: #5784ff;
 }
 
 .coauthor-link {
-    color: #4b7bff;
+    color: #5784ff;
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -375,7 +375,8 @@ body {
 }
 
 .profile-btn:hover {
-    background-color: #b8cbff;
+    background-color: #4e64a0;
+    color: white;
 }
 
 .close-btn {
@@ -388,6 +389,11 @@ body {
     font-size: 30px;
     cursor: pointer;
     z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: rgb(123, 182, 255);
 }
 
 /* authorship */
@@ -396,7 +402,7 @@ body {
     transition: opacity 0.6s ease-in-out;
     text-align: center;
     font-size: 12px;
-    color: #415487;
+    color: #4967ba;
     margin-top: 40px;
     padding-bottom: 40px;
 }

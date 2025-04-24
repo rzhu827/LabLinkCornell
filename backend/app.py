@@ -2,11 +2,13 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os, re
 from collections import defaultdict
-from utils import preprocessing, indices
+from utils import indices
 from utils.indices import get_query_terms
 from utils.similarity import calculate_jaccard_similarity
 import csv
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
+from wordfreq import zipf_frequency
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 import time
@@ -38,6 +40,11 @@ lsi_matrix = data["lsi_matrix"]
 theme_axes = data["theme_axes"]
 
 MAX_DOC_SCORE_CONTRIBUTION = 0.4
+
+VALID_ENGLISH = {
+    w for w in inverted_index
+    if w.isalpha() and wordnet.synsets(w)
+}
 
 abbreviations = {
     "3D": "Three-Dimensional",
@@ -560,14 +567,14 @@ def home():
 
 @app.route("/suggest")
 def suggest():
-    user_input = request.args.get("input", "").lower()
-    suggestions = set()
-
-    for word in inverted_index:
-        if word.startswith(user_input) and word in preprocessing.english_words:
-            suggestions.add(word)
-
-    return jsonify(sorted(suggestions)[:5])
+    user_input = request.args.get("input", "").lower().strip()
+    matches = [
+        word for word in VALID_ENGLISH
+        if word.startswith(user_input)
+    ]
+    # sort by descending language frequency:
+    matches.sort(key=lambda w: zipf_frequency(w, "en"), reverse=True)
+    return jsonify(matches[:5])
 
 @app.route('/search')
 def search():
