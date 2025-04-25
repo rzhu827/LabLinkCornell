@@ -224,7 +224,17 @@ body {
     width: 940px;
     font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, sans-serif;
     color: #aec3d2;
-    transition: transform 0.5s ease;
+}
+
+.professor-content {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.professor-content.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .divider-line {
@@ -355,6 +365,13 @@ body {
 }
 
 /* profile sidebar */
+.professor-sidebar {
+    position: sticky;
+    top: 100px;
+    z-index: 1000;
+    align-self: start;
+}
+
 .sidebar-toggle {
     margin: 0;
     background: none;

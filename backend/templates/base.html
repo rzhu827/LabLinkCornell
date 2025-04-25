@@ -177,52 +177,54 @@
             citations = citations || 0;
 
             return `<div class='professor-entry'>
-                <div class='divider-line'></div>
-                <div class='professor-header'>
-                    <p class='prof-name'><class="prof-link">${name}</p>
-                    
-                    <button class="sidebar-toggle" data-id="${id}" aria-label="Show profile">
-                        <img src="/static/images/arrow-right.png" alt="" class="toggle-icon">
-                    </button>
+                <div class="professor-content">
+                    <div class='divider-line'></div>
+                    <div class='professor-header'>
+                        <p class='prof-name'><class="prof-link">${name}</p>
+                        
+                        <button class="sidebar-toggle" data-id="${id}" aria-label="Show profile">
+                            <img src="/static/images/arrow-right.png" alt="" class="toggle-icon">
+                        </button>
 
-                    <p class='affiliation'>${affiliation}</p>
-                </div>
-                <p class='interests'>${interests.join(', ')}</p>
-                <div class='publications'>
-                    <h4>Relevant Publications:</h4>
-                    ${publications.length ?
+                        <p class='affiliation'>${affiliation}</p>
+                    </div>
+                    <p class='interests'>${interests.join(', ')}</p>
+                    <div class='publications'>
+                        <h4>Relevant Publications:</h4>
+                        ${publications.length ?
                     `<ul class='publications'>${publications.map(pub => `<li>${pub}</li>`).join("")}</ul>`
                     : `<p class="no-pubs-message">Relevant research focus, but no directly matching publications.</p>`
                 }
-                </div>
-                <div class='details'>
-                    <div class='citation-count'>
-                        ${citations} Citations
                     </div>
-                    <div class='coauthors'>
-                        <h4>Relevant Cornell Coauthors:</h4>
-                        <span>
-                            ${coauthors.length > 0
+                    <div class='details'>
+                        <div class='citation-count'>
+                            ${citations} Citations
+                        </div>
+                        <div class='coauthors'>
+                            <h4>Relevant Cornell Coauthors:</h4>
+                            <span>
+                                ${coauthors.length > 0
                     ? coauthors.map(([name, id]) => `<a href="https://scholar.google.com/citations?user=${id}" target="_blank" class="coauthor-link">${name}</a>`).join(', ')
                     : 'None'}
-                            </span>
+                                </span>
+                        </div>
                     </div>
                 </div>
-
-                 <!-- sliding sidebar -->
-                <aside id="profile-${id}" class="profile-sidebar">
-                    <p class="sidebar-name">
-                    <a
-                        href="https://scholar.google.com/citations?user=${id}"
-                        target="_blank"
-                        class="prof-link">
-                        ${name}
-                        <img src="/static/images/link.svg" alt="link" class="link-icon">
-                    </a>
-                    </p>
-                <canvas id="radar-${id}" width="250" height="250"></canvas>
-                <canvas id="bar-${id}" width="300" height="180" class="bar-chart"></canvas>
-                </aside>
+                <div class="professor-sidebar">
+                    <aside id="profile-${id}" class="profile-sidebar">
+                        <p class="sidebar-name">
+                        <a
+                            href="https://scholar.google.com/citations?user=${id}"
+                            target="_blank"
+                            class="prof-link">
+                            ${name}
+                            <img src="/static/images/link.svg" alt="link" class="link-icon">
+                        </a>
+                        </p>
+                    <canvas id="radar-${id}" width="250" height="250"></canvas>
+                    <canvas id="bar-${id}" width="300" height="180" class="bar-chart"></canvas>
+                    </aside>
+                </div>
             </div>`;
         }
 
@@ -237,6 +239,7 @@
         }
 
         function searchQuery() {
+            const box = document.getElementById("answer-box");
             let query = document.getElementById("search-query-input").value;
             let citation_btn = document.getElementById("citation-btn");
             let citations = citation_btn.childNodes[0].nodeValue.trim();
@@ -275,8 +278,8 @@
                     document.getElementById("answer-box").innerHTML = "";
 
                     data.forEach((row, index) => {
-                        let tempDiv = document.createElement("div")
-                        tempDiv.innerHTML = answerBoxTemplate(
+                        const temp = document.createElement("div");
+                        temp.innerHTML = answerBoxTemplate(
                             index + 1,
                             row.name,
                             row.id,
@@ -285,12 +288,22 @@
                             row.citations,
                             row.publications,
                             row.coauthors)
-                        document.getElementById("answer-box").appendChild(tempDiv)
+                        const entry = temp.firstElementChild;
+                        entry.classList.add("professor-entry");
+                        box.appendChild(entry);
+
+                        const content = entry.querySelector(".professor-content");
+
+                        setTimeout(() => {
+                            content.classList.add("visible");
+                        }, index * 100);
                     });
+                    box.scrollIntoView({ behavior: "smooth", block: "start" });
                     lastResults = data;
                     attachProfileToggles();
                 });
         }
+
         function attachProfileToggles() {
             // 1) Toggle sidebar on arrow click
             document.querySelectorAll('.sidebar-toggle').forEach(btn => {
