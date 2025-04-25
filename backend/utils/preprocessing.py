@@ -1,11 +1,5 @@
 import re
 import nltk
-from nltk import pos_tag, word_tokenize
-from nltk.stem import PorterStemmer, WordNetLemmatizer
-from nltk.corpus import words, wordnet, stopwords
-from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
-from collections import defaultdict
-from wordfreq import zipf_frequency
 
 nltk.download("wordnet")
 nltk.download("omw-1.4")
@@ -13,6 +7,13 @@ nltk.download("words")
 nltk.download("stopwords")
 nltk.download('punkt_tab')
 nltk.download('averaged_perceptron_tagger_eng')
+
+from nltk import pos_tag, word_tokenize
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.corpus import words, wordnet, stopwords
+from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
+from collections import defaultdict
+from wordfreq import zipf_frequency
 
 stemmer = PorterStemmer()
 stemmed_stop_words = [stemmer.stem(word) for word in ENGLISH_STOP_WORDS]
