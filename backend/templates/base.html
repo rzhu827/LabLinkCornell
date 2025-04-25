@@ -207,20 +207,11 @@
                             </span>
                     </div>
                 </div>
-
-                 <!-- sliding sidebar -->
-                <aside id="profile-${id}" class="profile-sidebar">
-                    <p class="sidebar-name">
-                    <a
-                        href="https://scholar.google.com/citations?user=${id}"
-                        target="_blank"
-                        class="prof-link">
-                        ${name}
-                        <img src="/static/images/link.svg" alt="link" class="link-icon">
-                    </a>
-                    </p>
-                <canvas id="radar-${id}" width="250" height="250"></canvas>
-                </aside>
+                <button class="profile-btn" data-id="${id}">Show Profile</button>
+                <div id="profile-${id}" class="profile-sidebar">
+                    <button class="close-btn" onclick="hideProfile('${id}')">×</button>
+                    <canvas id="radar-${id}" width="250" height="250"></canvas>
+                </div>
             </div>`;
         }
 
@@ -290,176 +281,93 @@
                 });
         }
 
-        function attachProfileToggles() {
-            // OPEN
-            document.querySelectorAll('.sidebar-toggle').forEach(btn => {
-                btn.onclick = e => {
-                    e.stopPropagation();
+        function showProfile(id, scores) {
+            document.querySelectorAll('.profile-sidebar.active')
+                .forEach(sb => sb.classList.remove('active'));
 
-                    const id = btn.dataset.id;
-                    const sidebar = document.getElementById(`profile-${id}`);
-                    const isOpen = sidebar.classList.contains('active');
+            // if it was closed, open & rotate
+            if (!isOpen) {
+                sidebar.classList.add('active');
+                btn.classList.add('rotated');
 
-                    // close any open sidebar and reset arrows
-                    document.querySelectorAll('.profile-sidebar.active')
-                        .forEach(sb => sb.classList.remove('active'));
-                    document.querySelectorAll('.sidebar-toggle.rotated')
-                        .forEach(b => b.classList.remove('rotated'));
+                // draw (or redraw) the radar chart
+                const prof = lastResults.find(p => p.id === id);
+                const labels = [
+                    "ML/Networks", "AI/Language", "Formal/Math", "Algo/Complexity",
+                    "Society/HCI", "Security/Game", "Stats/Models", "Bio/Eco"
+                ];
+                const data = labels.map((_, i) => prof.theme_scores[i + 1] || 0);
 
-                    // if it was closed, open & rotate
-                    if (!isOpen) {
-                        sidebar.classList.add('active');
-                        btn.classList.add('rotated');
-
-                        // draw (or redraw) the radar chart
-                        const prof = lastResults.find(p => p.id === id);
-                        const labels = [
-                            "ML/Networks", "AI/Language", "Formal/Math", "Algo/Complexity",
-                            "Society/HCI", "Security/Game", "Stats/Models", "Bio/Eco"
-                        ];
-                        const data = labels.map((_, i) => prof.theme_scores[i + 1] || 0);
-
-                        new Chart(
-                            document.getElementById(`radar-${id}`),
-                            {
-                                type: 'radar',
-                                data: {
-                                    labels,
-                                    datasets: [{
-                                        label: 'Semantic Profile',
-                                        data,
-                                        fill: true,
-                                        backgroundColor: 'rgba(54,162,235,0.2)',
-                                        borderColor: 'rgba(54,162,235,1)',
-                                        pointBackgroundColor: 'rgba(54,162,235,1)',
-                                        pointBorderColor: '#fff'
-                                    }]
+                new Chart(document.getElementById(`radar-${id}`), {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Semantic Profile',
+                            data: data,
+                            fill: true,
+                            backgroundColor: 'rgba(54,162,235,0.2)',
+                            borderColor: 'rgba(54,162,235,1)',
+                            pointBackgroundColor: 'rgba(54,162,235,1)',
+                            pointBorderColor: '#fff',
+                        }]
+                    },
+                    options: {
+                        layout: {
+                            padding: {
+                                top: 40
+                            }
+                        },
+                        scales: {
+                            r: {
+                                ticks: {
+                                    display: false
                                 },
-                                options: {
-                                    layout: { padding: { top: 28 } },
-                                    scales: {
-                                        r: {
-                                            ticks: { display: false },
-                                            pointLabels: {
-                                                color: 'rgba(182,199,255,1)',
-                                                font: { size: 12, weight: '500' }
-                                            },
-                                            grid: { color: 'rgba(64,76,116,1)' },
-                                            angleLines: { color: 'rgba(64,76,116,1)' }
-                                        }
-                                    },
-                                    plugins: {
-                                        legend: { display: false },
-                                        title: {
-                                            display: true,
-                                            text: "Semantic Profile",
-                                            color: 'rgba(174,195,210,1)',
-                                            font: { size: 14 }
-                                        }
+                                pointLabels: {
+                                    color: 'rgba(182, 199, 255, 1)',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
                                     }
+                                },
+                                grid: {
+                                    color: 'rgba(92, 112, 178, 1)'
+                                },
+                                angleLines: {
+                                    color: 'rgba(92, 112, 178, 1)'
                                 }
                             }
-                        );
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: "Semantic Profile",
+                                color: 'white',
+                                font: { size: 16 }
+                            }
+                        }
                     }
-                };
-            });
-
-            // CLOSE
-            document.addEventListener('click', e => {
-                if (e.target.closest('.sidebar-toggle') || e.target.closest('.profile-sidebar')) {
-                    return;
-                }
-                document.querySelectorAll('.profile-sidebar.active')
-                    .forEach(sb => sb.classList.remove('active'));
-                document.querySelectorAll('.sidebar-toggle.rotated')
-                    .forEach(b => b.classList.remove('rotated'));
-            });
-        }
-
-
-        // function showProfile(id, scores) {
-        //     document.querySelectorAll('.profile-sidebar.active')
-        //         .forEach(sb => sb.classList.remove('active'));
-
-        //     const sidebar = document.getElementById(`profile-${id}`);
-        //     sidebar.classList.add('active');
-
-        //     const labels = [
-        //         "ML/Networks", "AI/Language", "Formal/Math", "Algo/Complexity",
-        //         "Society/HCI", "Security/Game", "Stats/Models", "Bio/Eco"
-        //     ];
-        //     const data = labels.map((_, i) => scores[i + 1] ?? 0);
-
-        //     new Chart(document.getElementById(`radar-${id}`), {
-        //         type: 'radar',
-        //         data: {
-        //             labels: labels,
-        //             datasets: [{
-        //                 label: 'Semantic Profile',
-        //                 data: data,
-        //                 fill: true,
-        //                 backgroundColor: 'rgba(54,162,235,0.2)',
-        //                 borderColor: 'rgba(54,162,235,1)',
-        //                 pointBackgroundColor: 'rgba(54,162,235,1)',
-        //                 pointBorderColor: '#fff',
-        //             }]
-        //         },
-        //         options: {
-        //             layout: {
-        //                 padding: {
-        //                     top: 40
-        //                 }
-        //             },
-        //             scales: {
-        //                 r: {
-        //                     ticks: {
-        //                         display: false
-        //                     },
-        //                     pointLabels: {
-        //                         color: 'rgba(182, 199, 255, 1)',
-        //                         font: {
-        //                             size: 12,
-        //                             weight: '500'
-        //                         }
-        //                     },
-        //                     grid: {
-        //                         color: 'rgba(64, 76, 116, 1)'
-        //                     },
-        //                     angleLines: {
-        //                         color: 'rgba(64, 76, 116, 1)'
-        //                     }
-        //                 }
-        //             },
-        //             plugins: {
-        //                 legend: { display: false },
-        //                 title: {
-        //                     display: true,
-        //                     text: "Semantic Profile",
-        //                     color: 'white',
-        //                     font: { size: 16 }
-        //                 }
-        //             }
-        //         }
-        //     });
-        // }
-
-        // function hideProfile(id) {
-        //     document.getElementById(`profile-${id}`)
-        //         .classList.remove('active');
-        // }
-
-        window.addEventListener('scroll', () => {
-            const authorship = document.getElementById('authorship');
-            const scrollY = window.scrollY;
-            const viewportHeight = window.innerHeight;
-            const fullHeight = document.body.offsetHeight;
-
-            const isAtBottom = scrollY + viewportHeight >= fullHeight - 5;
-
-            if (isAtBottom) {
-                authorship.classList.add('show-authorship');
+                });
             }
-        });
+
+            function hideProfile(id) {
+                document.getElementById(`profile-${id}`)
+                    .classList.remove('active');
+            }
+
+            window.addEventListener('scroll', () => {
+                const authorship = document.getElementById('authorship');
+                const scrollY = window.scrollY;
+                const viewportHeight = window.innerHeight;
+                const fullHeight = document.body.offsetHeight;
+
+                const isAtBottom = scrollY + viewportHeight >= fullHeight - 5;
+
+                if (isAtBottom) {
+                    authorship.classList.add('show-authorship');
+                }
+            });
 
     </script>
 </body>
