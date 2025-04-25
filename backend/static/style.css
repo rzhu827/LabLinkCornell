@@ -139,7 +139,7 @@ body {
 
 .arrow {
     display: inline-block;
-    transition: transform 0.1s ease;
+    transition: transform 0.3s ease;
     color: #cadce9;
     font-size: 10px;
     margin-left: 5px;
@@ -156,6 +156,8 @@ body {
     border: none;
     cursor: pointer;
     padding: 5px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .search-btn img {
@@ -165,6 +167,10 @@ body {
     margin-top: 4px;
     margin-left: 15px;
     margin-right: 6px;
+}
+
+.search-btn:hover {
+    opacity: 0.8;
 }
 
 /* suggestions box */
@@ -211,7 +217,7 @@ body {
 
 .professor-entry {
     position: relative;
-    margin-bottom: 70px;
+    margin-bottom: 50px;
     padding: 32px;
     border-radius: 10px;
     background-color: transparent;
@@ -224,20 +230,24 @@ body {
 .divider-line {
     height: 0.5px;
     background-color: #aec3d2;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     width: 940px;
 }
 
 .professor-header {
+    margin-top: 40px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    /* don’t space-between */
+    justify-content: flex-start;
 }
 
 .prof-name {
     white-space: nowrap;
     font-size: 30px;
     margin: 0;
+    margin-right: 24px;
+    white-space: nowrap;
 }
 
 /* google scholar link */
@@ -270,7 +280,7 @@ body {
     font-size: 16px;
     font-weight: normal;
     color: #aec3d2;
-    margin: 0;
+    margin-left: auto;
     max-width: 60%;
     word-wrap: break-word;
 }
@@ -291,7 +301,7 @@ body {
 .publications {
     list-style-type: disc;
     /* color: #617CC7; */
-    color: #7b98ea;
+    color: #7aaafd;
     font-size: 16px;
 }
 
@@ -318,16 +328,16 @@ body {
     display: inline;
     font-size: 16px;
     margin-right: 5px;
-    color: #5784ff;
+    color: #3a78ff;
 }
 
 .coauthors span {
     font-size: 16px;
-    color: #5784ff;
+    color: #3a78ff;
 }
 
 .coauthor-link {
-    color: #5784ff;
+    color: #3a78ff;
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -337,6 +347,38 @@ body {
 }
 
 /* profile sidebar */
+.sidebar-toggle {
+    margin: 0;
+    background: none;
+    border: none;
+    opacity: 1;
+    display: flex;
+    padding: 0px;
+    transition: opacity 0.3s ease;
+    align-items: center;
+}
+
+.sidebar-toggle img {
+    width: 10px;
+    height: 10px;
+    transform: scale(3.2);
+}
+
+.sidebar-toggle:hover {
+    opacity: 0.8;
+}
+
+.sidebar-toggle .toggle-icon {
+    width: 10px;
+    height: 10px;
+    transform: scale(3.2) rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-toggle.rotated .toggle-icon {
+    transform: scale(3.2) rotate(180deg);
+}
+
 .profile-sidebar {
     position: fixed;
     top: 0;
@@ -357,6 +399,16 @@ body {
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
+}
+
+.sidebar-name {
+    margin-top: 40px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 26px;
+    color: #aec3d2;
+    flex-grow: 1;
 }
 
 .profile-btn {
@@ -393,7 +445,7 @@ body {
 }
 
 .close-btn:hover {
-    color: rgb(123, 182, 255);
+    color: rgb(89, 153, 255);
 }
 
 /* authorship */
