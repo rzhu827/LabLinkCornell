@@ -6,7 +6,16 @@ from utils import indices
 from utils.indices import get_query_terms
 from utils.similarity import calculate_jaccard_similarity
 import csv
+import nltk
 from nltk.stem import WordNetLemmatizer
+
+nltk.download("wordnet")
+nltk.download("omw-1.4")
+nltk.download("words")
+nltk.download("stopwords")
+nltk.download('punkt_tab')
+nltk.download('averaged_perceptron_tagger_eng')
+
 from nltk.corpus import wordnet
 from wordfreq import zipf_frequency
 from ast import literal_eval
