@@ -190,9 +190,10 @@
                 <p class='interests'>${interests.join(', ')}</p>
                 <div class='publications'>
                     <h4>Relevant Publications:</h4>
-                    <ul class='publications'>
-                        ${publications.map(pub => `<li>${pub}</li>`).join("")}
-                    </ul>
+                    ${publications.length ?
+                    `<ul class='publications'>${publications.map(pub => `<li>${pub}</li>`).join("")}</ul>`
+                    : `<p class="no-pubs-message">Relevant research focus, but no directly matching publications.</p>`
+                }
                 </div>
                 <div class='details'>
                     <div class='citation-count'>
@@ -220,7 +221,7 @@
                     </a>
                     </p>
                 <canvas id="radar-${id}" width="250" height="250"></canvas>
-                <canvas id="bar-${id}" width="300" height="200" class="bar-chart"></canvas>
+                <canvas id="bar-${id}" width="300" height="180" class="bar-chart"></canvas>
                 </aside>
             </div>`;
         }
@@ -335,7 +336,7 @@
                                     }]
                                 },
                                 options: {
-                                    layout: { padding: { top: 20, left: 24, right: 24 } },
+                                    layout: { padding: { top: 20, left: 20, right: 24 } },
                                     scales: {
                                         r: {
                                             ticks: { display: false },
@@ -402,7 +403,7 @@
                                         ]
                                     },
                                     options: {
-                                        layout: { padding: { top: 10, left: 30, right: 30 } },
+                                        layout: { padding: { top: 5, left: 30, right: 30 } },
                                         indexAxis: 'y',
                                         responsive: true,
                                         scales: {

@@ -289,7 +289,7 @@ body {
     margin-top: 30px;
     font-size: 18px;
     margin-bottom: 50px;
-    color: #aec3d2;
+    color: #9ab3c5;
 }
 
 .publications-section h4 {
@@ -301,13 +301,21 @@ body {
 .publications {
     list-style-type: disc;
     /* color: #617CC7; */
-    color: #7aaafd;
+    color: #7a9bd5;
     font-size: 16px;
 }
 
 .publications li {
     margin-bottom: 10px;
     font-style: italic;
+}
+
+.no-pubs-message {
+    text-align: center;
+    font-style: normal;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    color: #7a9bd5;
 }
 
 .details {
@@ -319,7 +327,7 @@ body {
 .citation-count {
     font-size: 14px;
     font-weight: bold;
-    color: #7b98ea;
+    color: #7a9bd5;
     margin-bottom: 40px;
     align-self: flex-end;
 }
@@ -328,16 +336,16 @@ body {
     display: inline;
     font-size: 16px;
     margin-right: 5px;
-    color: #3a78ff;
+    color: #5582e3;
 }
 
 .coauthors span {
     font-size: 16px;
-    color: #3a78ff;
+    color: #5582e3;
 }
 
 .coauthor-link {
-    color: #3a78ff;
+    color: #5582e3;
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -454,7 +462,7 @@ body {
     transition: opacity 0.6s ease-in-out;
     text-align: center;
     font-size: 12px;
-    color: #4967ba;
+    color: #334d94;
     margin-top: 40px;
     padding-bottom: 40px;
 }

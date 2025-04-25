@@ -90,6 +90,7 @@ abbreviations = {
     "CPS": "Cyber-Physical System",
     "CPU": "Central Processing Unit",
     "CRC": "Cyclic Redundancy Check",
+    "CS": "Computer Science",
     "CSCW": "Computer-Supported Cooperative Work", # Field Name
     "DAG": "Directed Acyclic Graph",
     "DC": "Direct Current",
@@ -486,6 +487,8 @@ def calculate_final_scores(prof_scores):
 #     return [pub for pub, _ in sorted(pub_scores, key=lambda x: x[1], reverse=True)[:3]]
 
 def get_relevant_publications(prof_key, prof_to_doc_scores):
+    if prof_key not in prof_to_doc_scores or not prof_to_doc_scores[prof_key]:
+        return []
     return [corpus[doc_idx] for doc_idx, _ in prof_to_doc_scores[prof_key].items()][:3]
 
 def get_relevant_coauthors(prof_key, query_vector):

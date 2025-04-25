@@ -70,6 +70,7 @@ abbreviations = {
     "CPS": "Cyber-Physical System",
     "CPU": "Central Processing Unit",
     "CRC": "Cyclic Redundancy Check",
+    "CS": "Computer Science",
     "CSCW": "Computer-Supported Cooperative Work", # Field Name
     "DAG": "Directed Acyclic Graph",
     "DC": "Direct Current",
@@ -340,7 +341,7 @@ def build_indices(data):
         5: ["social","human","interaction","identity","citizen","community","people","society", "ethics", "law", "moral"],  # social, human
         6: ["security","market","game","encryption","authentication"],  # security, markets
         7: ["statistics","analysis","data","modeling","regression","probability","graph"],  # statistics, data, probability
-        8: ["biology","ecology","biodiversity","health","environment","animals","survey","pharmacy","disability"],  # science, health, bio
+        8: ["biology","ecology","biodiversity","health","environment","animals","pharmacy","disability", "gene", "protein", "molecule"],  # science, health, bio
     }
 
     for tid, kws in theme_keywords.items():
