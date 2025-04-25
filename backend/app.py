@@ -29,6 +29,7 @@ prof_to_citations = data["prof_to_citations"]
 prof_to_interests = data["prof_to_interests"]
 prof_index_map = data["prof_index_map"]
 profid_to_name = data["profid_to_name"]
+prof_keys_list = [(name, id) for id, name in profid_to_name.items()]
 # cleaned_to_original = data["cleaned_to_original"]
 publications_to_idx = data["publications_to_idx"]
 corpus = data["corpus"]
@@ -38,6 +39,12 @@ count_vectorizer_analyze = data["count_vectorizer_analyze"]
 tfidf_matrix = data["tfidf_matrix"]
 lsi_matrix = data["lsi_matrix"]
 theme_axes = data["theme_axes"]
+profs_to_idx = data["profs_to_idx"]
+prof_sim_matrix = data["prof_sim_matrix"]
+coauthor_score_map, max_coauthor_score = data["coauthor_score_tup"]
+citation_score_map, max_citation_score = data["citation_score_tup"]
+
+# print(prof_pub_sim)
 
 MAX_DOC_SCORE_CONTRIBUTION = 0.4
 
@@ -273,6 +280,45 @@ def process_citation_range(citation_range):
         parts = re.sub(r'[^\d\-]', '', citation_range).split("-")
         return int(parts[0]), int(parts[1])
 
+def get_pub_similarity(prof1_key, prof2_key):
+    prof1_idx = profs_to_idx[prof1_key]
+    prof2_idx = profs_to_idx[prof2_key]
+    return prof_sim_matrix[prof1_idx, prof2_idx]
+
+def get_coauthor_score(prof1_key, prof2_key):
+    score = 0
+    prof1_id = prof1_key[1]
+    prof2_id = prof2_key[1]
+    if (prof1_id, prof2_id) in coauthor_score_map:
+        score = np.log(coauthor_score_map[(prof1_id, prof2_id)]) / np.log(max_coauthor_score)
+    elif (prof2_id, prof1_id) in coauthor_score_map:
+        score = np.log(coauthor_score_map[(prof2_id, prof1_id)]) / np.log(max_coauthor_score)
+    return score
+
+def get_citation_score(prof1_key, prof2_key):
+    score = 0
+    prof1_id = prof1_key[1]
+    prof2_id = prof2_key[1]
+    if (prof1_id, prof2_id) in citation_score_map:
+        score = np.log(citation_score_map[(prof1_id, prof2_id)]) / np.log(max_citation_score)
+    elif (prof2_id, prof1_id) in citation_score_map:
+        score = np.log(citation_score_map[(prof2_id, prof1_id)]) / np.log(max_citation_score)
+    return score
+
+def get_similar_profs(prof_key):
+    res = defaultdict(lambda : defaultdict(float))
+    for prof2_key in prof_keys_list:
+        if prof_key == prof2_key:
+            continue
+        # {prof_key : {pub_sim : score, coauthor_score : score, citation_score : score, total_score :}, ...}
+        res[prof2_key]["pub_sim"] = get_pub_similarity(prof_key, prof2_key)
+        res[prof2_key]["coauthor_score"] = get_coauthor_score(prof_key, prof2_key)
+        res[prof2_key]["citation_score"] = get_citation_score(prof_key, prof2_key)
+        res[prof2_key]["total_score"] = (1/3) * res[prof2_key]["pub_sim"] + (1/3) * res[prof2_key]["coauthor_score"] + (1/3) * res[prof2_key]["citation_score"]
+    res_sorted = [(prof_key, score_dict) for prof_key, score_dict in sorted(res.items(), key=lambda x : x[1]["total_score"], reverse=True)]
+    # print(prof_key[0])
+    # print(res_sorted)
+    return res_sorted
 
 def print_lsi_topics(svd_model, tfidf_vectorizer, top_n=10):
     terms = tfidf_vectorizer.get_feature_names_out()
@@ -456,7 +502,7 @@ def get_relevant_coauthors(prof_key, query_vector):
 
     return [(profid_to_name[coauthor], coauthor) for coauthor, _ in sorted(prof_scores.items(), key=lambda x: x[1], reverse=True)[:3]]
 
-def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
+def prepare_results(ranked_profs, query_vector, prof_to_doc_scores, prof_scores):
     """Prepare final results with professor details and relevant publications."""
     results = []
     
@@ -472,6 +518,10 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
             relevant_pubs = get_relevant_publications(prof_key, prof_to_doc_scores)
             rel_pubs_accum += (time.time() - start)
             start = time.time()
+            similar_profs = get_similar_profs(prof_key)[:3]
+            # print(prof_key[0])
+            # print(similar_profs)
+            # print()
             coauthors = get_relevant_coauthors(prof_key, query_vector)  # [(coauthor_name, coauthor_id)]
             co_authors_accum += (time.time() - start)
 
@@ -483,7 +533,8 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores):
                 "citations": prof_to_citations[prof_key],
                 "publications": relevant_pubs,
                 "coauthors": coauthors,
-                "theme_scores": score_professor_themes(prof_key)
+                "theme_scores": score_professor_themes(prof_key),
+                "similar_profs" : similar_profs
             })
     print(f"get_relevant_publications(): {rel_pubs_accum:.4f}")
     print(f"get_relevant_coauthors(): {co_authors_accum:.4f}")
@@ -553,7 +604,7 @@ def combined_search(query, citation_range=None):
     print(ranked_profs)
 
     start = time.time()
-    res = prepare_results(ranked_profs, query_vector, prof_to_doc_scores)
+    res = prepare_results(ranked_profs, query_vector, prof_to_doc_scores, prof_scores)
     print(f"prepare_results: {(time.time() - start):.4f}")
     for prof in res: # debugging
         print(prof["name"])

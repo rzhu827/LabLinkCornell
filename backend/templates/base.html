@@ -160,7 +160,7 @@
                 if (e.target.matches('.profile-btn')) {
                     const id = e.target.dataset.id;
                     const prof = lastResults.find(p => p.id === id);
-                    showProfile(id, prof.theme_scores);
+                    showProfile(id, prof.theme_scores, prof.similar_profs);
                 }
             });
 
@@ -214,6 +214,7 @@
                 <div id="profile-${id}" class="profile-sidebar">
                     <button class="close-btn" onclick="hideProfile('${id}')">×</button>
                     <canvas id="radar-${id}" width="250" height="250"></canvas>
+                    <canvas id="bar-${id}" width="200" height="100" style="margin-top: 20px;"></canvas>
                 </div>
             </div>`;
         }
@@ -284,7 +285,7 @@
                 });
         }
 
-        function showProfile(id, scores) {
+        function showProfile(id, scores, similar_profs) {
             document.querySelectorAll('.profile-sidebar.active')
                 .forEach(sb => sb.classList.remove('active'));
 
@@ -347,6 +348,126 @@
                         }
                     }
                 }
+            });
+
+            const bar_labels = similar_profs.map(([[name, id],]) => name);
+            const pubScores = similar_profs.map(([_, scores_dict]) => scores_dict["pub_sim"]);
+            const coauthorScores = similar_profs.map(([_, scores_dict]) => scores_dict["coauthor_score"]);
+            const citationScores = similar_profs.map(([_, scores_dict]) => scores_dict["citation_score"]);
+            const links = similar_profs.map(([[name, id],]) => `https://scholar.google.com/citations?user=${id}`);
+            const bar_graph = new Chart(document.getElementById(`bar-${id}`), {
+                type: "bar",
+                data: {
+                    labels: bar_labels,
+                    labelLinks: links,
+                    datasets: [
+                        {
+                            label: "Publication Similarity",
+                            data: pubScores,
+                            backgroundColor: "rgba(54,162,235,0.3)",
+                            borderColor: "rgba(54,162,235,1)",
+                            borderWidth: 1.0
+                        },
+                        {
+                            label: "Coauthorship Score",
+                            data: coauthorScores,
+                            backgroundColor: "rgba(182, 199, 255, 0.3)",
+                            borderColor: "rgba(182, 199, 255, 1)",
+                            // backgroundColor: "rgba(92, 112, 178, 0.3)",
+                            // borderColor: "rgba(92, 112, 178, 1)",
+                            borderWidth: 1.0
+                        },
+                        {
+                            label: "Citation Connectedness",
+                            data: citationScores,
+                            backgroundColor: "rgba(255,255,255, 0.3)",
+                            borderColor: "rgba(255,255,255, 1)",
+                            borderWidth: 1.0
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: "y",
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: { size: 10 },
+                                stepSize: 0.1,
+                                color: "rgba(182, 199, 255, 1)",
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: "500"
+                                },
+                                color: "rgba(182, 199, 255, 1)"
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: "Similar Professors",
+                            font: {
+                                size: 16,
+                            },
+                            color: 'white'
+                        }
+                    },
+                    elements: {
+                        bar: {
+                            barThickness: 5
+                        }
+                    }
+                }
+            });
+
+            function clickableScales(bar_graph, click) {
+                const { ctx, canvas, scales: { x, y } } = bar_graph
+                let rect = canvas.getBoundingClientRect();
+                x_coord = click.clientX - rect.left;
+                y_coord = click.clientY - rect.top;
+                const top = y.top
+                const left = y.left
+                const right = y.right
+                const tick_height = y.height / y.ticks.length
+
+                for (let i = 0; i < y.ticks.length; i++) {
+                    if (x_coord >= left && x_coord <= right && y_coord >= top + (i * tick_height) && y_coord <= top + ((i + 1) * tick_height)) {
+                        window.open(bar_graph.data.labelLinks[i])
+                    }
+                }
+            }
+
+            function changeCursor(bar_graph, hover) {
+                const { ctx, canvas, scales: { x, y } } = bar_graph
+                let rect = canvas.getBoundingClientRect();
+                x_coord = hover.clientX - rect.left;
+                y_coord = hover.clientY - rect.top;
+                const top = y.top
+                const left = y.left
+                const right = y.right
+                const bottom = y.bottom
+                if (x_coord >= left && x_coord <= right && y_coord >= top && y_coord <= bottom) {
+                    bar_graph.canvas.style.cursor = 'pointer';
+                } else {
+                    bar_graph.canvas.style.cursor = 'default';
+                }
+            }
+
+            bar_graph.canvas.addEventListener('click', (e) => {
+                clickableScales(bar_graph, e)
+            });
+
+            bar_graph.canvas.addEventListener('mousemove', (e) => {
+                changeCursor(bar_graph, e)
             });
         }
 

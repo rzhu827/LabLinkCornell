@@ -3,7 +3,9 @@ from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from preprocessing import custom_tokenizer_lemmatize, default_dict_int
 from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics.pairwise import cosine_similarity
 import pickle
+import csv
 import lzma
 
 # SVD ANALYSIS
@@ -20,6 +22,8 @@ interest_index = defaultdict(set)                       # {interest_term: {prof_
 prof_to_citations = {}                                  # {prof_key: citations}
 prof_to_publications = {}                               # {prof_key: [publications]}
 prof_to_interests = {}                                  # {prof_key: [interests]}
+profs_enumerated = {}                                   # {prof_key1 : 0, prof_key2 : 1, ...}
+profs_list = []
 prof_index_map = {}                                     # {doc_index: prof_key}
 profid_to_name = {}                                     # {prof_id: prof_name}
 cleaned_to_original = {}                                # {processed publication: original publication}
@@ -31,6 +35,8 @@ tfidf_matrix = None
 svd = None
 lsi_matrix = None
 theme_axes = {}
+coauthor_score_map = defaultdict(int)
+citation_score_map = defaultdict(int)
 
 # SVD ANALYSIS
 terms = None
@@ -269,6 +275,7 @@ def build_indices(data):
             cleaned_to_original[processed_pub] = publication
             processed_publications.append(processed_pub)
             corpus.append(processed_pub)
+            profs_list.append(prof_key)
             prof_index_map[len(corpus) - 1] = prof_key
             for term in custom_tokenizer_lemmatize(processed_pub):
                 inverted_index[term][prof_key] += 1
@@ -282,6 +289,8 @@ def build_indices(data):
             for term in custom_tokenizer_lemmatize(processed_interest):
                 interest_index[term].add(prof_key)
         prof_to_interests[prof_key] = processed_interests
+
+    profs_to_idx = {prof_key : idx for idx, prof_key in enumerate(set(profs_list))}
 
     tfidf_vectorizer = TfidfVectorizer(
         tokenizer=custom_tokenizer_lemmatize,     
@@ -308,6 +317,14 @@ def build_indices(data):
     svd = TruncatedSVD(n_components=100)
     lsi_matrix = svd.fit_transform(tfidf_matrix)
 
+    prof_to_pub_vecs = defaultdict(list)
+    for prof_key, vec in zip(profs_list, lsi_matrix):
+      prof_to_pub_vecs[prof_key].append(vec)
+
+    vecs = np.array([np.mean(vec_list, axis=0) for vec_list in prof_to_pub_vecs.values()])
+
+    prof_sim_matrix = cosine_similarity(vecs)
+
     # start = time.time()
     count_vectorizer = CountVectorizer(ngram_range=(1, 3), tokenizer=custom_tokenizer_lemmatize)
     count_vectorizer.fit(corpus)
@@ -331,6 +348,32 @@ def build_indices(data):
         tf    = tfidf_vectorizer.transform([pseudo])
         theme_axes[tid] = svd.transform(tf).flatten()
 
+    with open("../network/citation_network_partial.csv", encoding="utf-8") as file:
+      reader = csv.DictReader(file)
+      for edge in reader:  
+          prof1 = edge["author1_id"]
+          prof2 = edge["author2_id"]
+          if (prof1, prof2) in citation_score_map:
+              citation_score_map[(prof1, prof2)] += int(edge["citation_count"])
+          elif (prof2, prof1) in citation_score_map:
+              citation_score_map[(prof2, prof1)] += int(edge["citation_count"])
+          else:
+              citation_score_map[(prof1, prof2)] += int(edge["citation_count"])
+    
+    max_citation_score = max(citation_score_map.values())
+    citation_score_tup = (citation_score_map, max_citation_score)
+
+    with open("../network/coauthor_edgelist.csv", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        for edge in reader:
+            prof1 = edge["Source"]
+            prof2 = edge["Target"]
+            coauthor_score_map[(prof1, prof2)] = int(edge["Weight"])
+                
+    max_coauthor_score = max(coauthor_score_map.values())
+    coauthor_score_tup = (coauthor_score_map, max_coauthor_score)
+
+
     with lzma.open("precomputed_data.pkl", "wb") as f:
         pickle.dump({"dataset" : data,
                     "inverted_index" : inverted_index, 
@@ -348,7 +391,11 @@ def build_indices(data):
                      "tfidf_matrix" : tfidf_matrix,
                      "svd" : svd,
                      "lsi_matrix" : lsi_matrix,
-                     "theme_axes" : theme_axes,}, f)
+                     "theme_axes" : theme_axes,
+                     "profs_to_idx" : profs_to_idx,
+                     "prof_sim_matrix" : prof_sim_matrix,
+                     "coauthor_score_tup": coauthor_score_tup,
+                     "citation_score_tup": citation_score_tup}, f)
 
 def top_terms_for_component(comp_idx, n=5):
     component = svd.components_[comp_idx]
