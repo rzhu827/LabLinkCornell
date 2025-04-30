@@ -260,6 +260,18 @@ def replace_abbreviations(text):
 def load_data():
     with open("../profs_and_publications.json", "r", encoding="utf-8") as f:
         return json.load(f)
+    
+def score_professor_themes(prof_key):
+    """
+    Compute each professor's 8-theme score.
+    """
+    idxs = [i for i, p in prof_index_map.items() if p == prof_key]  # all docs authored by prof
+    P = lsi_matrix[idxs]
+
+    # compute mean dot-product with each theme axis
+    raw = {theme_id: float(np.dot(P, axis_vec).mean()) for theme_id, axis_vec in theme_axes.items()}
+    mx  = max(raw.values()) or 1.0
+    return {theme_id: raw[theme_id]/mx for theme_id in raw}
 
 def build_indices(data):
     global tfidf_vectorizer, tfidf_matrix, publications_to_idx, svd, lsi_matrix, count_vectorizer, terms
@@ -374,6 +386,9 @@ def build_indices(data):
     max_coauthor_score = max(coauthor_score_map.values())
     coauthor_score_tup = (coauthor_score_map, max_coauthor_score)
 
+    prof_to_themes = {prof_key : score_professor_themes(prof_key) for prof_key in set(profs_list)} # {prof_key : {theme1 : score, ...}, ...}
+    prof_themes = np.array([list(prof_to_themes[prof_key].values()) for prof_key in prof_to_themes])
+    prof_themes_matrix = cosine_similarity(prof_themes)
 
     with lzma.open("precomputed_data.pkl", "wb") as f:
         pickle.dump({"dataset" : data,
@@ -396,7 +411,9 @@ def build_indices(data):
                      "profs_to_idx" : profs_to_idx,
                      "prof_sim_matrix" : prof_sim_matrix,
                      "coauthor_score_tup": coauthor_score_tup,
-                     "citation_score_tup": citation_score_tup}, f)
+                     "citation_score_tup": citation_score_tup,
+                     "prof_to_themes" : prof_to_themes,
+                     "prof_themes_matrix" : prof_themes_matrix}, f)
 
 def top_terms_for_component(comp_idx, n=5):
     component = svd.components_[comp_idx]
