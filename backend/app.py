@@ -20,7 +20,6 @@ from nltk.corpus import wordnet
 from wordfreq import zipf_frequency
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
-import time
 import numpy as np
 
 app = Flask(__name__)
@@ -53,10 +52,7 @@ prof_sim_matrix = data["prof_sim_matrix"]
 coauthor_score_map, max_coauthor_score = data["coauthor_score_tup"]
 citation_score_map, max_citation_score = data["citation_score_tup"]
 prof_to_themes = data["prof_to_themes"]
-print(prof_to_themes)
 prof_themes_matrix = data["prof_themes_matrix"]
-
-# print(prof_pub_sim)
 
 MAX_DOC_SCORE_CONTRIBUTION = 0.4
 
@@ -306,48 +302,6 @@ def print_lsi_topics(svd_model, tfidf_vectorizer, top_n=10):
         for term, weight in top_terms:
             print(f"  {term:<20} {weight:.4f}")
 
-# def score_by_publications(query_vector_array, prof_scores):
-#     """Score professors by publication similarity by TF-IDF."""
-#     for idx, doc_vector in enumerate(indices.tfidf_matrix):
-#         doc_vector_array = doc_vector.toarray()[0]
-#         similarity = cosine_sim(query_vector_array, doc_vector_array)
-        
-#         if similarity > 0:
-#             prof_key = indices.prof_index_map[idx]
-#             prof_scores[prof_key]['publication_score'] += similarity
-
-# def score_by_publications_lsi(query_vector, prof_scores):
-#     prof_scores_list = defaultdict(list)
-#     query_lsi = indices.svd.transform(query_vector)
-
-#     similarities = cosine_similarity(query_lsi, indices.lsi_matrix).flatten()
-
-#     for doc_index, score in enumerate(similarities):
-#         prof_key = indices.prof_index_map[doc_index]
-#         prof_scores_list[prof_key].append(score)
-
-#     for key, scores in prof_scores_list.items():
-#         prof_scores_list[key].sort()
-#         prof_scores[key]['publication_score'] = sum(scores[-10:])
-
-
-# def score_professor_themes(prof_key):
-#     """
-#     Compute each professor's 8-theme score.
-#     """
-#     idxs = [i for i, p in prof_index_map.items() if p == prof_key]  # all docs authored by prof
-#     P = lsi_matrix[idxs]
-
-#     # compute mean dot-product with each theme axis
-#     raw = {theme_id: float(np.dot(P, axis_vec).mean()) for theme_id, axis_vec in theme_axes.items()}
-#     mx  = max(raw.values()) or 1.0
-#     return {theme_id: raw[theme_id]/mx for theme_id in raw}
-
-# def get_pub_similarity(prof1_key, prof2_key):
-#     prof1_scores = np.array(list(score_professor_themes(prof1_key).values())).reshape(1,-1)
-#     prof2_scores = np.array(list(score_professor_themes(prof2_key).values())).reshape(1,-1)
-#     return cosine_similarity(prof1_scores, prof2_scores)[0][0]
-
 def get_pub_similarity(prof1_key, prof2_key):
     prof1_idx = profs_to_idx[prof1_key]
     prof2_idx = profs_to_idx[prof2_key]
@@ -395,7 +349,6 @@ def score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_score
     query_lsi = svd.transform(query_vector)
     similarities = cosine_similarity(query_lsi, lsi_matrix).flatten()
 
-    # term_weights = defaultdict(lambda: defaultdict(float))  # term -> prof_key -> score
     prof_to_doc_scores = defaultdict(lambda: defaultdict(float)) # {prof_key : {doc_idx: score}, ...}
 
     for term in query_terms_set:
@@ -424,27 +377,6 @@ def score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_score
     
     return {prof_key : dict(sorted(score_dict.items(), key= lambda x: x[1], reverse=True)) for prof_key, score_dict in prof_to_doc_scores.items()}
 
-    # for term, prof_scores_map in term_weights_expanded.items():
-    #     if not prof_scores_map:
-    #         continue
-    #     summed_scores = [sum(score for score in doc_scores_map.values()) for doc_scores_map in prof_scores_map.values()]
-    #     max_score = max(summed_scores)
-    #     if max_score == 0:
-    #         continue
-    #     for prof_key, doc_scores_map in prof_scores_map.items():
-    #         for doc_idx in doc_scores_map:
-    #             term_weights_expanded[term][prof_key][doc_idx] /= max_score
-    #             prof_scores[prof_key]['publication_score'] += term_weights_expanded[term][prof_key][doc_idx]
-            
-    # prof_to_scores_expanded = defaultdict(lambda : defaultdict(float)) # {prof_key : {doc_idx : score}, ...}
-    # for term, prof_map in term_weights_expanded.items():
-    #     for prof_key, doc_map in prof_map.items():
-    #         for doc_idx, score in doc_map.items():
-    #             prof_to_scores_expanded[prof_key][doc_idx] += score
-
-    # return {prof_key : dict(sorted(score_dict.items(), key= lambda x: x[1], reverse=True)) for prof_key, score_dict in prof_to_scores_expanded.items()}
-
-
 def score_by_interests(query_terms, prof_scores):
     """Score professors based on interest relevance using Jaccard similarity."""
     matching_profs = set()
@@ -457,21 +389,6 @@ def score_by_interests(query_terms, prof_scores):
         similarity = calculate_jaccard_similarity(query_terms, prof_interests)
         prof_scores[prof_key]['interest_score'] = similarity
 
-# def score_by_citations(citation_low, citation_high, prof_scores):
-#     """
-#     Score professors based on citation counts within range. 
-#     Normalized to make sure higher citation counts are not unfairly weighed higher
-#     If citations not in range, still considered but penalized 
-#     """
-#     max_citations = max(indices.prof_to_citations.values()) if indices.prof_to_citations else 1
-    
-#     for prof_key, citations in indices.prof_to_citations.items():
-#         normalized_score = citations / max_citations
-#         if citation_low <= citations <= citation_high:
-#             prof_scores[prof_key]['citation_score'] = normalized_score
-#         else:
-#             prof_scores[prof_key]['citation_score'] = normalized_score * 0.5 #If not in range, less weight
-
 def calculate_final_scores(prof_scores):
     """Calculate final weighted scores with different weights."""
     weights = {
@@ -482,17 +399,6 @@ def calculate_final_scores(prof_scores):
     for prof_key, scores in prof_scores.items():
         total_score = sum(scores[factor] * weights[factor] for factor in weights)
         prof_scores[prof_key]['total_score'] = total_score
-
-# def get_relevant_publications(prof_key, query_vector):
-#     """Get top 3 most relevant publications for a professor using TF-IDF similarity."""
-#     publications = indices.prof_to_publications[prof_key]
-#     pub_scores = []
-#     for publication in publications:
-#         pub_vector = indices.tfidf_vectorizer.transform([publication])
-#         similarity = cosine_similarity(query_vector, pub_vector)[0][0]
-#         og_title = indices.cleaned_to_original.get(publication, publication)
-#         pub_scores.append((og_title, similarity))
-#     return [pub for pub, _ in sorted(pub_scores, key=lambda x: x[1], reverse=True)[:3]]
 
 def get_relevant_publications(prof_key, prof_to_doc_scores):
     if prof_key not in prof_to_doc_scores or not prof_to_doc_scores[prof_key]:
@@ -526,26 +432,16 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores, prof_scores)
     """Prepare final results with professor details and relevant publications."""
     results = []
     
-    rel_pubs_accum = 0 
-    co_authors_accum = 0
     for prof_key, _ in ranked_profs:
         prof_name, prof_id = prof_key
         prof_data = next((p for p in dataset if p["id"] == prof_id), None)
         
         if prof_data:
             # Get top 3 relevant publications
-            start = time.time()
             relevant_pubs = get_relevant_publications(prof_key, prof_to_doc_scores)
-            rel_pubs_accum += (time.time() - start)
-            start = time.time()
             similar_profs = get_similar_profs(prof_key)[:3]
-            # print(prof_key[0])
-            # # print(similar_profs)
-            # # print()
             themes = prof_to_themes[prof_key]
-            # print(themes)
             coauthors = get_relevant_coauthors(prof_key, query_vector)  # [(coauthor_name, coauthor_id)]
-            co_authors_accum += (time.time() - start)
 
             results.append({
                 "name": prof_name,
@@ -558,8 +454,6 @@ def prepare_results(ranked_profs, query_vector, prof_to_doc_scores, prof_scores)
                 "theme_scores": themes,
                 "similar_profs" : similar_profs
             })
-    print(f"get_relevant_publications(): {rel_pubs_accum:.4f}")
-    print(f"get_relevant_coauthors(): {co_authors_accum:.4f}")
     return results
 
 def combined_search(query, citation_range=None):
@@ -568,20 +462,8 @@ def combined_search(query, citation_range=None):
     professor interests, publications and citations. 
     Returns list of top 5 professors with their details and top 3 relevant publications.
     """
-    # query_terms_set = set(custom_tokenizer(query))
-    # if not query_terms_set:
-    #     return []
-    # start = time.time()
     query_terms_set = get_query_terms(query, count_vectorizer_analyze, tfidf_vectorizer)
-    # print(f"get_query_terms(): {(time.time() - start):.4f}")
-    
-    # Convert query to TF-IDF vector for publication matching
-    # start = time.time()
     query_vector = tfidf_vectorizer.transform([query])
-    # print(f"query_vector(): {(time.time() - start):.4f}")
-    # query_vector_array = query_vector.toarray()[0]  # raw tfidf scoring
-    
-    # print_lsi_topics(svd, tfidf_vectorizer, top_n=10) #TRYING TO INTEPRET SVD
     
     prof_scores = defaultdict(lambda: {
         'publication_score': 0,  # TF-IDF
@@ -590,48 +472,22 @@ def combined_search(query, citation_range=None):
         'total_score': 0         # Weighted combination
     })
     
-    # start = time.time()
     citation_low, citation_high = process_citation_range(citation_range)
-    # print(f"process_citation_range(): {(time.time() - start):.4f}")
-
-    # score_by_publications(query_vector_array, prof_scores)
-    # score_by_publications_lsi(query_vector, prof_scores)
-    # start = time.time()
     prof_to_doc_scores = score_by_publications_lsi_balanced(query_vector, query_terms_set, prof_scores)
-    # print(f"score_by_pubs(): {(time.time() - start):.4f}")
-    # start = time.time()
-    # score_by_interests(query_terms_set, prof_scores)
-    # print(f"score_by_interests(): {(time.time() - start):.4f}")
-    # score_by_citations(citation_low, citation_high, prof_scores)
 
-    # start = time.time()
     calculate_final_scores(prof_scores)
-    # print(f"calc_final_scores(): {(time.time() - start):.4f}")
 
-    # filter profs based on citation range
-    # start = time.time()
     filtered_prof_scores = {
         prof_key: scores for prof_key, scores in prof_scores.items()
         if citation_low <= prof_to_citations[prof_key] <= citation_high
     }
-    # print(f"filter prof scores: {(time.time() - start):.4f}")
 
-    # print(prof_scores) #debugginggg 
-    # start = time.time()
     ranked_profs = sorted(
         [(prof_key, scores) for prof_key, scores in filtered_prof_scores.items()],
         key=lambda x: x[1]['total_score'],
         reverse=True)[:5]
-    # print(f"rank profs: {(time.time() - start):.4f}")
-    # print(ranked_profs)
-
-    # start = time.time()
+    
     res = prepare_results(ranked_profs, query_vector, prof_to_doc_scores, prof_scores)
-    # print(f"prepare_results: {(time.time() - start):.4f}")
-    # for prof in res: # debugging
-    #      print(prof["name"])
-    #      print(prof["coauthors"])
-    #      print() 
     return res
 
 @app.route("/")

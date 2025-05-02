@@ -10,10 +10,9 @@ nltk.download('averaged_perceptron_tagger_eng')
 
 from nltk import pos_tag, word_tokenize
 from nltk.stem import PorterStemmer, WordNetLemmatizer
-from nltk.corpus import words, wordnet, stopwords
+from nltk.corpus import wordnet, stopwords
 from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
 from collections import defaultdict
-from wordfreq import zipf_frequency
 
 stemmer = PorterStemmer()
 stemmed_stop_words = [stemmer.stem(word) for word in ENGLISH_STOP_WORDS]
@@ -56,14 +55,6 @@ def custom_tokenizer_lemmatize(text):
         lemma  = lemmatizer.lemmatize(token, wn_pos)
         lemmas.append(lemma)
     return lemmas
-
-# def custom_tokenizer_lemmatize(text):
-#     """Custom tokenizer for lemmatization and tokenization."""
-#     # start = time.time()
-#     tokens = re.sub(r'[^\w\s]', '', text.lower()).split()
-#     res = [lemmatizer.lemmatize(token) for token in tokens if token not in ENGLISH_STOP_WORDS]
-#     # print(f"custom_tokenizer_lemmatize(): {(time.time() - start):.4f}")
-#     return res
 
 def preprocess_text(text):
     """Clean and tokenize text with ngrams. EDIT: Unused."""

@@ -419,45 +419,6 @@ def top_terms_for_component(comp_idx, n=5):
     component = svd.components_[comp_idx]
     top_idxs = np.argsort(component)[-n:][::-1]
     return [tfidf_vectorizer.get_feature_names_out()[i] for i in top_idxs]
-
-# def top_titles_for_component(comp_idx, n=5):
-#     comp_vals = lsi_matrix[:, comp_idx]
-#     top_doc_idxs = np.argsort(np.abs(comp_vals))[-n:][::-1]
-#     return [cleaned_to_original[corpus[i]] for i in top_doc_idxs]
-
-# def clustering():
-#     global km
-#     km = KMeans(n_clusters=20, random_state=42)
-#     km.fit(lsi_matrix[:, :20])
-#     centroids = km.cluster_centers_
-
-#     print("\nCluster Centroid Analysis\n")
-#     for cid, center in enumerate(centroids):
-#         top_dims = np.argsort(np.abs(center))[-3:][::-1]
-#         names = [f"LSI_{d+1}" for d in top_dims]
-#         terms = [top_terms_for_component(d, n=5) for d in top_dims]
-#         print(f"Cluster {cid}: top dims = {names}")
-#         for d, tlist in zip(top_dims, terms):
-#             print("  LSI", d+1, "→", tlist)
-#         print()
-
-#     # Count frequency of LSI dimensions
-#     all_dims = []
-#     for center in centroids:
-#         top_dims = np.argsort(np.abs(center))[-3:]
-#         all_dims.extend(top_dims)
-
-#     dim_counts = Counter(all_dims)
-#     most_common_dims = dim_counts.most_common(20)
-
-#     print("\nTop Themes by Cluster Frequency\n")
-#     for dim, freq in most_common_dims:
-#         print(f"LSI {dim+1} (appears in {freq} clusters):")
-#         print("  Top terms:", top_terms_for_component(dim))
-#         print("  Top publications:")
-#         for title in top_titles_for_component(dim):
-#             print("   →", title[:100], "...")
-#         print()
     
 def inspect_theme_axis(axis_vec, n_components=5, n_terms=5):
     top_dims = np.argsort(np.abs(axis_vec))[-n_components:][::-1]
@@ -506,6 +467,3 @@ def dims():
 if __name__ == "__main__":
     data = load_data()
     build_indices(data)
-    # clustering()
-    # analyze_and_export()
-    # dims()
