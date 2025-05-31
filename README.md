@@ -1,33 +1,31 @@
-# 4300-Flask-Template-JSON
+# LabLink Cornell
 
-## Contents
+A Flask-based web application for semantically exploring Cornell professors' research profiles. Users can search by interest and filter by citation count.
 
-- [Summary](#summary)
-- [Deploying on the server](#deploying-on-the-server )
-- [Running Locally](#running-locally)
-- [Uploading Large Files](#uploading-large-files)
-- [Debugging Some Basic Errors](#debugging-some-basic-errors)
-- [Virtual Environments and Dependency Tracking](#virtual-environments-and-dependency-tracking)
-- [Troubleshooting](#troubleshooting)
-- [General comments from the author](#general-comments-from-the-author)
+## 🧠 Overview
+This project was built as part of Cornell's CS/INFO 4300 course. It leverages Flask for backend routing, a lightweight JSON backend as a database alternative, and custom frontend styling for a clean and intuitive search experience.
+- Users can query topics of interest and view matched professors.
+- Citation filters, semantic profiling, similar professors, and Google Scholar links help refine exploration.
+- Designed with Vanta background animation and responsive layout.
 
-## Summary
-
-This is a template for **"CS/INFO 4300 class at Cornell University"**
-
-You will use this template to directly deploy your Flask code on the project server.
-
-After you follow the steps below, you should have set up a public address dedicated to your team's project at (for the moment) a template app will be running.  In future milestones you will be updating the code to replace that template with your very own app.
+### See below for more information.
 
 
-## Deploying on the server 
+## 📦 Contents
 
-For the initial deployment, only one member of your team needs to follow the steps below.
+- [🚀 Deploying on the server](#-deploying-on-the-server)
+- [💻 Running Locally](#-running-locally)
+- [📁 Uploading Large Files](#-uploading-large-files)
+- [🐞 Debugging Some Basic Errors](#-debugging-some-basic-errors)
+- [🧪 Virtual Environments and Dependency Tracking](#-virtual-environments-and-dependency-tracking)
+- [🛠️ Troubleshooting](#-troubleshooting)
+- [📝 General Comments](#-general-comments)
 
+## 🚀 Deploying on the server
 
 ### Step 0: Forking or Cloning this template
 
-- You should make a FORK or CLONE of this repository on (regular/your public) GitHub, make sure that your repository is PUBLIC.  Keep in mind that other students will be able to see your repository.
+- You should make a FORK or CLONE of this repository on (regular/your public) GitHub, make sure that your repository is PUBLIC.
 
 ### Step 1: Login to the deployment dashboard
 
@@ -53,14 +51,10 @@ For the initial deployment, only one member of your team needs to follow the ste
 - Click **build**, and wait for a minute. If all goes successfully, hitting the refresh button on the Container Information table and the logs tab will show the created data from the service. If this doesn't work, logout and log back in.
 - Now, clicking on the URL button should lead you to a simple episode-searching app
 - If it doesn't load initially, give it a few seconds and reload.
-- This should be the screen you see. Test it out
 
-![image](https://user-images.githubusercontent.com/55399795/224594465-e317dd02-7519-4fd7-aaca-32457650ce36.png)
+## 💻 Running locally
 
-## Running locally
-
-- This is not formally a requirement of P01.  This is to help you test and develop your app locally; we recommend each member of the team to try this out. 
-- Ensure that you have Python version 3.10 or above installed on your machine (ideally in a virtual environment). Some of the libraries and code used in the template, as well as on the server end, are only compatible with Python versions 3.10 and above.
+This is to help you test and develop your app locally. Ensure that you have Python version 3.10 or above installed on your machine (ideally in a virtual environment). Some of the libraries and code used in the template, as well as on the server end, are only compatible with Python versions 3.10 and above.
   
 ### Step 1: Set up a virtual environment
 Create a virtual environment in Python. You may continue using the one you setup for assignment if necessary. To review how to set up a virtual environment and activate it, refer to A0 assignment writeup.
@@ -77,7 +71,7 @@ You can change data in this file to your project's json data, but do not delete 
 ## Command to run project locally: 
 ```flask run --host=0.0.0.0 --port=5000```
 
-## Uploading Large Files 
+## 📁 Uploading Large Files 
 - Note: This feature is correctly under testing
 - When your dataset is ready, it should be of the form of a JSON file of 128MB or less.
   - 128MB is negotiable, based on your dataset requirements
@@ -86,7 +80,7 @@ You can change data in this file to your project's json data, but do not delete 
   - In the event your file does not get consistently uploaded due to network issues or takes too long (it really shouldn't) you may request a manual upload
 - This JSON file that you upload will always replace your **init.json** file. This means that when you build your project, this file will be automatically imported into your Database and be available to use.
 
-## Debugging Some Basic Errors
+## 🐞 Debugging Some Basic Errors
 - After the build, wait a few seconds as the server will still be loading, especially for larger applications with a lot of setup
 - **Do not change the Dockerfiles without permission**
 - Sometimes, if a deployment doesn't work, you can try logging out and back in to see if it works
@@ -94,7 +88,7 @@ You can change data in this file to your project's json data, but do not delete 
 - If it isn't a 401, first try checking the logs or container status. Check if the containers are alive or not, which could cause issues. If the containers are down, try stopping and starting them. If that does not work, you can report it on ED.
 - If data isn't important, destroying and then cloning and re-building containers will usually fix the issue (assuming there's no logical error)
 
-## Virtual Environments and Dependency Tracking
+## 🧪 Virtual Environments and Dependency Tracking
 - It's essential to avoid uploading your virtual environments, as they can significantly inflate the size of your project. Large repositories will lead to issues during cloning, especially when memory limits are crossed (Limit – 2GB). 
 To prevent your virtual environment from being tracked and uploaded to GitHub, follow these steps:
 1. **Exclude Virtual Environment**
@@ -110,15 +104,15 @@ Afterward, ensure to follow step 1 to prevent future tracking of virtual environ
     - Navigate to your project backend directory and run the command `pip freeze > requirements.txt`. This command will create or overwrite the `requirements.txt` file with a list of installed packages and their versions. 
     - Our server will use your project’s `requirements.txt` file to install all required packages, ensuring that your project runs seamlessly.
 
-## Troubleshooting
+## 🛠 Troubleshooting
 
 The attached google document includes a compilation of frequent issues encountered by students across various project stages, detailing whether these issues have been resolved and the solutions that were effective. We will continue to update this list with new information.
 
 Link: https://docs.google.com/document/d/1sF2zsubii_SYJLfZN02UB9FvtH1iLmi9xd-X4wbpbo8
 
-## General comments from the author
+## 📝 General Comments
 
-- Since this project was made in the span of a few weeks, it is very likely things will break from time to time. If things break, you can send an email through the course email or post to ED first.
-- If you would like to see stuff added to the dashboard you can send an email through the course email and prefix the title with FEATURE REQUEST
-- You can also email regarding any questions relating to the service itself. If you think things can be improved or some better logic can be implemented for certain portions, or even just want to know more about the project then feel free to do so.
+This project was developed by:
+Beau Hayes-Pollard, Analeah Real, Joice Chen, Tina Chen, and Richard Zhu
 
+README.md adapted from original authors.
